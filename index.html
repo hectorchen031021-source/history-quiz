@@ -104,7 +104,7 @@
     <div class="stage" id="intro">
       <div class="kicker">历史人格测试</div>
       <h1>你像哪位东亚历史人物？</h1>
-      <p class="sub">收录 <b>1800 年以后</b>的 <b>50 位东亚历史人物</b>（中国 · 日本 · 韩国 · 朝鲜 · 蒙古 · 台湾），从<span class="tag">经济政治倾向</span><span class="tag">国际法态度</span><span class="tag">行事方式</span><span class="tag">性格</span>四个维度、共 <b>60 道题</b>，测出与你最相似的那一位。</p>
+      <p class="sub">收录 <b>1800 年以后</b>的 <b>50 位东亚历史人物</b>（中国 · 日本 · 韩国 · 朝鲜 · 蒙古 · 台湾），从<span class="tag">经济政治倾向</span><span class="tag">国际与外交观</span><span class="tag">价值取向</span><span class="tag">行事方式</span><span class="tag">性格气质</span>五个维度、共 <b>60 道题</b>，测出与你最相似的那一位。</p>
       <div style="margin-top:28px">
         <button class="btn" onclick="startQuiz()">开始测试（60 题）</button>
       </div>
@@ -196,378 +196,376 @@ const figures = {
   qiujin: { name:"秋瑾", char:"秋", nation:"中国", title:"鉴湖女侠", desc:"你英姿飒爽、侠肝义胆，为革命与妇女解放不惜献身。你刚烈豪迈、视死如归，是巾帼不让须眉的革命志士。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Qiu_jin.jpg/330px-Qiu_jin.jpg", quote:"身不得男儿列，心却比男儿烈", intro:"秋瑾（1875—1907），近代民主革命家、女权先驱，参加反清起义失败就义，号「鉴湖女侠」。" },
 };
 
-const DIMS = ["经济政治倾向","国际法态度","行事方式","性格"];
+const DIMS = ["经济政治倾向","国际与外交观","价值取向","行事方式","性格气质"];
 const LETTERS = ['A','B','C','D','E','F'];
 
 const questions = [
-  // ===== 维度一：经济政治倾向（15题）=====
-  { d:0, q:"关于经济体制，你更认同哪种看法？", options:[
+  // ===== 经济政治倾向 =====
+{ d:0, q:"关于经济体制，你更认同哪种看法？", options:[
     { t:"计划与公有为主，由国家统一调配。", s:{ mao:2, chen:2, dazhao:2, kim:2 } },
     { t:"市场经济、自由竞争。", s:{ hu:2, okuma:2, lee:2, fuze:1 } },
     { t:"国家主导、统制经济。", s:{ meiji:2, jiang:2, park:2, kishi:2 } },
     { t:"市场为主，国家在关键领域掌舵。", s:{ deng:2, jing:2, ikeda:2 } },
   ]},
-  { d:0, q:"社会财富分配上，你更倾向？", options:[
+{ d:0, q:"社会财富分配上，你更倾向？", options:[
     { t:"平均主义，追求共同富裕。", s:{ mao:2, chen:2, kim:2 } },
     { t:"允许差距，鼓励竞争与奋斗。", s:{ okuma:2, lee:2, hu:1, fuze:1 } },
     { t:"兼顾效率与公平。", s:{ deng:2, jing:2, dae:2, zhou:1 } },
     { t:"国强优先，可容忍暂时不均。", s:{ meiji:2, park:2, yuan:2 } },
   ]},
-  { d:0, q:"你认为社会变革应该怎样进行？", options:[
+{ d:0, q:"你认为社会变革应该怎样进行？", options:[
     { t:"彻底革命，推倒重来。", s:{ mao:2, chen:2, hong:2, kim:2 } },
     { t:"渐进改良，稳步推进。", s:{ liang:2, hu:2, ito:2, zhang:2 } },
     { t:"自上而下的维新变法。", s:{ kang:2, meiji:2, longma:2, jing:1 } },
     { t:"维持既有秩序与传统。", s:{ cixi:2, zeng:2, xian:1 } },
   ]},
-  { d:0, q:"你希望政府扮演什么角色？", options:[
+{ d:0, q:"你希望政府扮演什么角色？", options:[
     { t:"强政府，集中力量办大事。", s:{ meiji:2, yuan:2, park:2, chun:2 } },
     { t:"小政府，管得越少越好。", s:{ hu:2, okuma:2, lee:2, fuze:1 } },
     { t:"大政府，全面保障民生。", s:{ song:2, dae:2, liang:1 } },
     { t:"有限但有为，该管的管、该放的放。", s:{ deng:2, jing:2, zhou:1 } },
   ]},
-  { d:0, q:"「自由」「平等」「秩序」之间，你更看重？", options:[
-    { t:"自由优先。", s:{ hu:2, okuma:2, fuze:2, lee:2 } },
-    { t:"平等优先。", s:{ mao:2, chen:2, dazhao:2, kim:1 } },
-    { t:"秩序与稳定优先。", s:{ zeng:2, cixi:2, chun:2, park:1 } },
-    { t:"三者兼顾、相互成就。", s:{ sun:2, zhou:2, dae:2 } },
-  ]},
-  { d:0, q:"对待传统文化，你的态度？", options:[
-    { t:"彻底反传统、破旧立新。", s:{ chen:2, luxun:2, mao:2 } },
-    { t:"中学为体、西学为用，渐进融合。", s:{ zhang:2, liang:2, ito:2 } },
-    { t:"全盘西化／脱亚入欧。", s:{ fuze:2, hu:2 } },
-    { t:"坚守传统与固有秩序。", s:{ zeng:2, cixi:2, xixiang:2 } },
-  ]},
-  { d:0, q:"关于对外开放，你的立场？", options:[
+{ d:0, q:"关于对外开放，你的立场？", options:[
     { t:"积极开放、向强者学习。", s:{ fuze:2, ito:2, longma:2, okuma:2 } },
     { t:"闭关自守、自力更生。", s:{ mao:2, cixi:2 } },
     { t:"师夷长技以制夷。", s:{ lin:2, zhang:2, zuo:2 } },
     { t:"开放但有底线、保持自主。", s:{ deng:2, zhou:2, jing:2 } },
   ]},
-  { d:0, q:"你最认同哪种国家认同？", options:[
+{ d:0, q:"你最认同哪种国家认同？", options:[
     { t:"民族独立、本国至上。", s:{ sun:2, jiang:2, lin:2, an:2, kimku:1, bogd:1 } },
     { t:"国际主义、天下大同。", s:{ mao:2, chen:1, dazhao:2, song:2 } },
     { t:"阶级与革命认同。", s:{ kim:2, sukh:2, dazhao:1 } },
     { t:"世界主义、融入文明。", s:{ kang:2, liang:2, fuze:1 } },
   ]},
-  { d:0, q:"对待君主与帝制，你的态度？", options:[
+{ d:0, q:"对待君主与帝制，你的态度？", options:[
     { t:"坚决推翻、建立共和。", s:{ sun:2, chen:2, mao:2, hong:2 } },
     { t:"君主立宪、虚君实宪。", s:{ kang:2, liang:2, ito:2, longma:2 } },
     { t:"拥护并维系皇权。", s:{ cixi:2, zeng:1, meiji:2, bogd:1 } },
     { t:"无所谓形式，只看实效。", s:{ li:2, zhang:2, jing:2, yuan:1 } },
   ]},
-  { d:0, q:"关于民生福利，你的态度？", options:[
+{ d:0, q:"关于民生福利，你的态度？", options:[
     { t:"政府提供全面保障。", s:{ song:2, kim:2, dae:2 } },
     { t:"适度福利、量力而行。", s:{ deng:2, jing:2, ikeda:2 } },
     { t:"低福利、优先发展经济。", s:{ park:2, meiji:2, lee:1 } },
     { t:"民间互助、不依赖政府。", s:{ zeng:2, hu:1 } },
   ]},
-  { d:0, q:"对待土地与农民，你的立场？", options:[
+{ d:0, q:"对待土地与农民，你的立场？", options:[
     { t:"耕者有其田、土地改革。", s:{ sun:2, mao:2, kim:2 } },
     { t:"保护地主、维护传统秩序。", s:{ zeng:2, cixi:2 } },
     { t:"工业化优先，暂时牺牲农业。", s:{ meiji:2, park:2, jiang:2 } },
     { t:"城乡均衡、协调发展。", s:{ deng:2, jing:1 } },
   ]},
-  { d:0, q:"对待资本与工商业，你会？", options:[
+{ d:0, q:"对待资本与工商业，你会？", options:[
     { t:"发展民族工商业、实业救国。", s:{ zhang:2, liang:2, sun:2 } },
     { t:"消灭剥削、公私合营。", s:{ mao:2, chen:2 } },
     { t:"官督商办、国家掌控。", s:{ li:2, yuan:2, meiji:2 } },
     { t:"自由放任、鼓励私营。", s:{ okuma:2, hu:2, lee:2 } },
   ]},
-  { d:0, q:"对改革节奏，你更认同？", options:[
+{ d:0, q:"对改革节奏，你更认同？", options:[
     { t:"激进，一步到位。", s:{ chen:2, mao:2, hong:2 } },
     { t:"温和，循序渐进。", s:{ liang:2, hu:2, ito:2, jing:2 } },
     { t:"强力铁腕，快刀斩乱麻。", s:{ yuan:2, park:2, chun:2 } },
     { t:"摸着石头过河。", s:{ deng:3 } },
   ]},
-  { d:0, q:"对外部世界的态度？", options:[
-    { t:"对外扩张、建立势力。", s:{ tojo:2, meiji:2, yamagata:2, togou:1 } },
-    { t:"和平共处、不称霸。", s:{ zhou:2, deng:2, dae:2, yoshida:1 } },
-    { t:"收复失土、保家卫国。", s:{ zuo:2, lin:2, jiang:2, an:1, zhangxueliang:1 } },
-    { t:"结盟自强、借力发展。", s:{ li:2, ito:2, kishi:2 } },
-  ]},
-  { d:0, q:"你心中理想的社会图景是？", options:[
-    { t:"大同世界、共同富裕。", s:{ sun:2, kang:2, song:2, dazhao:1 } },
-    { t:"富国强兵、自立于世界。", s:{ meiji:2, ito:2, fuze:2, zhang:1 } },
-    { t:"自由民主、法治社会。", s:{ hu:2, okuma:2, lee:2, dae:2 } },
-    { t:"独立自主的强国。", s:{ mao:2, jiang:2, kim:1, sukh:1 } },
-  ]},
-
-  // ===== 维度二：国际法态度（15题）=====
-  { d:1, q:"面对国际规则与条约，你的态度是？", options:[
-    { t:"严守国际法，以规则立国。", s:{ gu:2, zhou:2, okuma:2 } },
-    { t:"弱肉强食，实力至上。", s:{ tojo:2, yamagata:2, yuan:2 } },
-    { t:"利用规则、为我所用。", s:{ li:2, ito:2, kishi:2 } },
-    { t:"反帝，不信强权规则。", s:{ mao:2, kim:2, an:2 } },
-  ]},
-  { d:1, q:"关于国际秩序，你希望？", options:[
-    { t:"建立国际合作机制。", s:{ gu:2, song:2, dae:2 } },
-    { t:"强权均势、现实平衡。", s:{ li:2, ito:2, yamagata:2 } },
-    { t:"民族自决、各守其土。", s:{ sun:2, kimku:2, sukh:2, an:1 } },
-    { t:"推翻旧秩序、建立新世界。", s:{ mao:2, chen:2, dazhao:2 } },
-  ]},
-  { d:1, q:"对外交往，你的方式更接近？", options:[
-    { t:"以夷制夷、借力打力。", s:{ li:2, ito:2, kishi:2 } },
-    { t:"强硬对抗、宁折不弯。", s:{ lin:2, zuo:2, mao:2, jiang:2 } },
-    { t:"谈判协商、和平解决。", s:{ zhou:2, gu:2, dae:2 } },
-    { t:"依附强国、寻求庇护。", s:{ rhee:2, kishi:1, yoshida:1 } },
-  ]},
-  { d:1, q:"关于战争与和平，你的看法？", options:[
-    { t:"反对战争，主张非暴力。", s:{ song:2, dae:2, kang:2 } },
-    { t:"必要时以武力解决。", s:{ togou:2, tojo:2, yamagata:2, peng:1 } },
-    { t:"决不投降、血战到底。", s:{ xixiang:2, jiang:2, an:2, lin:1 } },
-    { t:"慎战，和平发展优先。", s:{ zhou:2, deng:2, jing:2, yoshida:1 } },
-  ]},
-  { d:1, q:"对殖民地与被压迫民族，你的立场？", options:[
-    { t:"支持民族独立解放。", s:{ sun:2, kimku:2, an:2, sukh:2 } },
-    { t:"反帝反殖、输出革命。", s:{ mao:2, kim:2, dazhao:1 } },
-    { t:"同情弱小、痛恨列强。", s:{ lin:2, zuo:2, qiujin:2 } },
-    { t:"承认现实、忍辱图强。", s:{ li:2, ito:1, zeng:1 } },
-  ]},
-  { d:1, q:"关于领土与主权，你会？", options:[
-    { t:"寸土不让、誓死捍卫。", s:{ zuo:2, lin:2, jiang:2, an:2 } },
-    { t:"和平谈判解决争端。", s:{ zhou:2, gu:2, dae:2 } },
-    { t:"通过战争开疆拓土。", s:{ tojo:2, togou:2, meiji:2 } },
-    { t:"实力不足、先隐忍图强。", s:{ li:2, mao:1, ito:1 } },
-  ]},
-  { d:1, q:"对国际组织，你的态度？", options:[
-    { t:"积极参与、主动融入。", s:{ gu:2, zhou:2, okuma:2, dae:1 } },
-    { t:"利用但不依赖。", s:{ deng:2, ito:2, kishi:2 } },
-    { t:"怀疑抵触、自力更生。", s:{ mao:2, kim:2 } },
-    { t:"另起炉灶、建立新体系。", s:{ chen:2, dazhao:1, sukh:1 } },
-  ]},
-  { d:1, q:"你的地缘战略更倾向？", options:[
-    { t:"大陆经略、开疆拓土。", s:{ zuo:2, meiji:2, yamagata:2, tojo:1 } },
-    { t:"发展海权、走向海洋。", s:{ togou:2, tojo:1, meiji:1 } },
-    { t:"韬光养晦、积蓄实力。", s:{ deng:3, jing:1 } },
-    { t:"输出革命、解放世界。", s:{ mao:2, kim:2, dazhao:1 } },
-  ]},
-  { d:1, q:"对外关系的独立自主程度？", options:[
-    { t:"坚决独立、不依附大国。", s:{ mao:2, jiang:2, kim:2, an:1 } },
-    { t:"结盟求安全。", s:{ rhee:2, kishi:2, lee:1, yoshida:1 } },
-    { t:"灵活务实、左右逢源。", s:{ li:2, ito:2, zhou:2 } },
-    { t:"依附强者、加速发展。", s:{ fuze:1, okuma:1, meiji:1 } },
-  ]},
-  { d:1, q:"对外谈判，你的风格？", options:[
-    { t:"强硬、寸步不让。", s:{ jiang:2, an:2, lin:2, zuo:1 } },
-    { t:"灵活、以柔克刚。", s:{ zhou:2, li:2, ito:2, deng:2 } },
-    { t:"讲求道义、以理服人。", s:{ gu:2, song:2, kang:2 } },
-    { t:"拖延周旋、待时而动。", s:{ yuan:2, cixi:1, li:1 } },
-  ]},
-  { d:1, q:"关于国际盟友，你的观点？", options:[
-    { t:"稳定同盟、长久合作。", s:{ rhee:2, kishi:2, jiang:1 } },
-    { t:"利益同盟、随时调整。", s:{ li:2, ito:2, yuan:2 } },
-    { t:"不结盟、独立自主。", s:{ mao:2, kim:2, deng:2 } },
-    { t:"反帝统一战线。", s:{ sun:2, chen:2, kimku:2, zhangxueliang:2 } },
-  ]},
-  { d:1, q:"对国际规则的双重标准，你的态度？", options:[
-    { t:"反对双标、要求公平。", s:{ sun:2, kimku:2, mao:2 } },
-    { t:"接受现实、为我所用。", s:{ li:2, ito:2, deng:2 } },
-    { t:"制定规则、主导秩序。", s:{ meiji:2, okuma:1, gu:1 } },
-    { t:"只认实力，规则次要。", s:{ tojo:2, yamagata:2, yuan:1 } },
-  ]},
-  { d:1, q:"对外部援助与依赖，你的态度？", options:[
+{ d:0, q:"对外部援助与依赖，你的态度？", options:[
     { t:"自力更生、拒绝依赖。", s:{ mao:2, kim:2, sukh:2 } },
     { t:"利用外资发展自己。", s:{ deng:2, jing:2, ikeda:2 } },
     { t:"接受援助、亲美合作。", s:{ rhee:2, kishi:2, jiang:2 } },
     { t:"谨慎接受、防止受制于人。", s:{ zuo:2, li:1, ito:2 } },
   ]},
-  { d:1, q:"对民族独立运动，你的立场？", options:[
+  // ===== 国际与外交观 =====
+{ d:1, q:"对外部世界的态度？", options:[
+    { t:"对外扩张、建立势力。", s:{ tojo:2, meiji:2, yamagata:2, togou:1 } },
+    { t:"和平共处、不称霸。", s:{ zhou:2, deng:2, dae:2, yoshida:1 } },
+    { t:"收复失土、保家卫国。", s:{ zuo:2, lin:2, jiang:2, an:1, zhangxueliang:1 } },
+    { t:"结盟自强、借力发展。", s:{ li:2, ito:2, kishi:2 } },
+  ]},
+{ d:1, q:"面对国际规则与条约，你的态度是？", options:[
+    { t:"严守国际法，以规则立国。", s:{ gu:2, zhou:2, okuma:2 } },
+    { t:"弱肉强食，实力至上。", s:{ tojo:2, yamagata:2, yuan:2 } },
+    { t:"利用规则、为我所用。", s:{ li:2, ito:2, kishi:2 } },
+    { t:"反帝，不信强权规则。", s:{ mao:2, kim:2, an:2 } },
+  ]},
+{ d:1, q:"关于国际秩序，你希望？", options:[
+    { t:"建立国际合作机制。", s:{ gu:2, song:2, dae:2 } },
+    { t:"强权均势、现实平衡。", s:{ li:2, ito:2, yamagata:2 } },
+    { t:"民族自决、各守其土。", s:{ sun:2, kimku:2, sukh:2, an:1 } },
+    { t:"推翻旧秩序、建立新世界。", s:{ mao:2, chen:2, dazhao:2 } },
+  ]},
+{ d:1, q:"关于战争与和平，你的看法？", options:[
+    { t:"反对战争，主张非暴力。", s:{ song:2, dae:2, kang:2 } },
+    { t:"必要时以武力解决。", s:{ togou:2, tojo:2, yamagata:2, peng:1 } },
+    { t:"决不投降、血战到底。", s:{ xixiang:2, jiang:2, an:2, lin:1 } },
+    { t:"慎战，和平发展优先。", s:{ zhou:2, deng:2, jing:2, yoshida:1 } },
+  ]},
+{ d:1, q:"对殖民地与被压迫民族，你的立场？", options:[
+    { t:"支持民族独立解放。", s:{ sun:2, kimku:2, an:2, sukh:2 } },
+    { t:"反帝反殖、输出革命。", s:{ mao:2, kim:2, dazhao:1 } },
+    { t:"同情弱小、痛恨列强。", s:{ lin:2, zuo:2, qiujin:2 } },
+    { t:"承认现实、忍辱图强。", s:{ li:2, ito:1, zeng:1 } },
+  ]},
+{ d:1, q:"关于领土与主权，你会？", options:[
+    { t:"寸土不让、誓死捍卫。", s:{ zuo:2, lin:2, jiang:2, an:2 } },
+    { t:"和平谈判解决争端。", s:{ zhou:2, gu:2, dae:2 } },
+    { t:"通过战争开疆拓土。", s:{ tojo:2, togou:2, meiji:2 } },
+    { t:"实力不足、先隐忍图强。", s:{ li:2, mao:1, ito:1 } },
+  ]},
+{ d:1, q:"对国际组织，你的态度？", options:[
+    { t:"积极参与、主动融入。", s:{ gu:2, zhou:2, okuma:2, dae:1 } },
+    { t:"利用但不依赖。", s:{ deng:2, ito:2, kishi:2 } },
+    { t:"怀疑抵触、自力更生。", s:{ mao:2, kim:2 } },
+    { t:"另起炉灶、建立新体系。", s:{ chen:2, dazhao:1, sukh:1 } },
+  ]},
+{ d:1, q:"你的地缘战略更倾向？", options:[
+    { t:"大陆经略、开疆拓土。", s:{ zuo:2, meiji:2, yamagata:2, tojo:1 } },
+    { t:"发展海权、走向海洋。", s:{ togou:2, tojo:1, meiji:1 } },
+    { t:"韬光养晦、积蓄实力。", s:{ deng:3, jing:1 } },
+    { t:"输出革命、解放世界。", s:{ mao:2, kim:2, dazhao:1 } },
+  ]},
+{ d:1, q:"对外关系的独立自主程度？", options:[
+    { t:"坚决独立、不依附大国。", s:{ mao:2, jiang:2, kim:2, an:1 } },
+    { t:"结盟求安全。", s:{ rhee:2, kishi:2, lee:1, yoshida:1 } },
+    { t:"灵活务实、左右逢源。", s:{ li:2, ito:2, zhou:2 } },
+    { t:"依附强者、加速发展。", s:{ fuze:1, okuma:1, meiji:1 } },
+  ]},
+{ d:1, q:"关于国际盟友，你的观点？", options:[
+    { t:"稳定同盟、长久合作。", s:{ rhee:2, kishi:2, jiang:1 } },
+    { t:"利益同盟、随时调整。", s:{ li:2, ito:2, yuan:2 } },
+    { t:"不结盟、独立自主。", s:{ mao:2, kim:2, deng:2 } },
+    { t:"反帝统一战线。", s:{ sun:2, chen:2, kimku:2, zhangxueliang:2 } },
+  ]},
+{ d:1, q:"对民族独立运动，你的立场？", options:[
     { t:"武装抗争、血荐轩辕。", s:{ kimku:2, an:2, sun:2, sukh:2 } },
     { t:"非暴力、议会请愿。", s:{ xian:2, wei:1, dae:2 } },
     { t:"革命暴动、挺身而出。", s:{ qiujin:2, mao:2, chen:2 } },
     { t:"寻求外部支持、渐进自治。", s:{ bogd:2, rhee:1, lee:1 } },
   ]},
-  { d:1, q:"对国际秩序的最终期望？", options:[
+{ d:1, q:"对国际秩序的最终期望？", options:[
     { t:"融入西方主导秩序。", s:{ fuze:2, okuma:2, kishi:2, rhee:1, yoshida:1 } },
     { t:"改造旧秩序、另立新规。", s:{ sun:2, mao:2, kim:2 } },
     { t:"独立自主、不选边站队。", s:{ deng:2, zhou:2, kim:1 } },
     { t:"建立东亚新秩序。", s:{ meiji:2, tojo:2, yamagata:2 } },
   ]},
-
-  // ===== 维度三：行事方式（15题）=====
-  { d:2, q:"你达成目标的主要手段更接近？", options:[
-    { t:"谈判妥协、纵横捭阖。", s:{ li:2, zhou:2, ito:2 } },
-    { t:"武力强攻、雷霆手段。", s:{ togou:2, peng:2, tojo:2, xixiang:1 } },
-    { t:"革命暴动、武装起义。", s:{ sun:2, qiujin:2, hong:2, kim:1 } },
-    { t:"渐进改良、制度设计。", s:{ liang:2, hu:2, jing:2, ikeda:1 } },
+  // ===== 价值取向 =====
+{ d:2, q:"「自由」「平等」「秩序」之间，你更看重？", options:[
+    { t:"自由优先。", s:{ hu:2, okuma:2, fuze:2, lee:2 } },
+    { t:"平等优先。", s:{ mao:2, chen:2, dazhao:2, kim:1 } },
+    { t:"秩序与稳定优先。", s:{ zeng:2, cixi:2, chun:2, park:1 } },
+    { t:"三者兼顾、相互成就。", s:{ sun:2, zhou:2, dae:2 } },
   ]},
-  { d:2, q:"做重大决策时，你更依赖？", options:[
-    { t:"理性计算与利益分析。", s:{ li:2, yuan:2, ito:2, kishi:1 } },
-    { t:"信念与理想。", s:{ sun:2, dazhao:2, song:2, qiujin:1 } },
-    { t:"直觉与个人决断。", s:{ mao:2, togou:2, jiang:1 } },
-    { t:"广泛征询、民主协商。", s:{ zhou:2, gu:2, okuma:2 } },
+{ d:2, q:"对待传统文化，你的态度？", options:[
+    { t:"彻底反传统、破旧立新。", s:{ chen:2, luxun:2, mao:2 } },
+    { t:"中学为体、西学为用，渐进融合。", s:{ zhang:2, liang:2, ito:2 } },
+    { t:"全盘西化／脱亚入欧。", s:{ fuze:2, hu:2 } },
+    { t:"坚守传统与固有秩序。", s:{ zeng:2, cixi:2, xixiang:2 } },
   ]},
-  { d:2, q:"面对反对者，你通常会？", options:[
-    { t:"说服争取、凝聚共识。", s:{ zhou:2, liang:2, dae:2 } },
-    { t:"排除异己、坚决清除。", s:{ yuan:2, cixi:2, chun:2, kim:1 } },
-    { t:"分化瓦解、各个击破。", s:{ li:2, ito:2, kishi:2 } },
-    { t:"刚烈对抗、宁折不弯。", s:{ luxun:2, xixiang:2, an:2, peng:1 } },
+{ d:2, q:"你心中理想的社会图景是？", options:[
+    { t:"大同世界、共同富裕。", s:{ sun:2, kang:2, song:2, dazhao:1 } },
+    { t:"富国强兵、自立于世界。", s:{ meiji:2, ito:2, fuze:2, zhang:1 } },
+    { t:"自由民主、法治社会。", s:{ hu:2, okuma:2, lee:2, dae:2 } },
+    { t:"独立自主的强国。", s:{ mao:2, jiang:2, kim:1, sukh:1 } },
   ]},
-  { d:2, q:"你的用人风格是？", options:[
-    { t:"唯才是举、不拘一格。", s:{ zeng:2, jiang:2, meiji:2 } },
-    { t:"忠诚可靠优先。", s:{ mao:2, kim:2, chun:1, cixi:1 } },
-    { t:"平衡各方、协调关系。", s:{ li:2, zhou:2, ito:2 } },
-    { t:"敢用有争议的人才。", s:{ deng:2, yuan:2, park:2 } },
+{ d:2, q:"对国际规则的双重标准，你的态度？", options:[
+    { t:"反对双标、要求公平。", s:{ sun:2, kimku:2, mao:2 } },
+    { t:"接受现实、为我所用。", s:{ li:2, ito:2, deng:2 } },
+    { t:"制定规则、主导秩序。", s:{ meiji:2, okuma:1, gu:1 } },
+    { t:"只认实力，规则次要。", s:{ tojo:2, yamagata:2, yuan:1 } },
   ]},
-  { d:2, q:"你对权力的看法？", options:[
+{ d:2, q:"你对权力的看法？", options:[
     { t:"急流勇退、不恋权位。", s:{ sun:2, zhou:1, gu:1 } },
     { t:"牢牢掌控、不容旁落。", s:{ cixi:2, yuan:2, chun:2, kim:2 } },
     { t:"权力为理想与事业服务。", s:{ mao:2, chen:1, dazhao:1, qiujin:1 } },
     { t:"权力是用来做事的工具。", s:{ deng:2, li:2, park:2, jing:1 } },
   ]},
-  { d:2, q:"面对失败，你通常会？", options:[
-    { t:"越挫越勇、永不言弃。", s:{ sun:2, mao:2, kimku:2, an:1 } },
-    { t:"反思复盘、调整策略。", s:{ liang:2, deng:2, zhou:2 } },
-    { t:"宁为玉碎、不为瓦全。", s:{ xixiang:2, qiujin:2, an:2 } },
-    { t:"隐忍待时、东山再起。", s:{ li:2, zeng:2, mao:1 } },
-  ]},
-  { d:2, q:"你做事的计划性如何？", options:[
-    { t:"长远规划、步步为营。", s:{ deng:2, ito:2, meiji:2, zhang:1 } },
-    { t:"当机立断、抓住战机。", s:{ togou:2, yuan:2, longma:2 } },
-    { t:"理想驱动、随势而动。", s:{ qiujin:2, hong:2, dazhao:1 } },
-    { t:"制度保障、按部就班。", s:{ okuma:2, gu:2, ikeda:1 } },
-  ]},
-  { d:2, q:"对规则的运用，你倾向？", options:[
-    { t:"制定规则、约束他人。", s:{ meiji:2, ito:2, yuan:2 } },
-    { t:"严格遵守既有规则。", s:{ gu:2, hu:2, dae:2 } },
-    { t:"变通规则、达成目的。", s:{ li:2, deng:2, kishi:2 } },
-    { t:"打破规则、破旧立新。", s:{ mao:2, chen:2, luxun:2, hong:1 } },
-  ]},
-  { d:2, q:"危机中的领导方式？", options:[
-    { t:"沉着稳舵、凝聚人心。", s:{ zhou:2, jing:2, ikeda:2 } },
-    { t:"果断强硬、当机立断。", s:{ togou:2, peng:2, chun:2, tojo:1 } },
-    { t:"坚守原则、绝不妥协。", s:{ sun:2, dazhao:2, an:2 } },
-    { t:"灵活应变、随机调整。", s:{ li:2, deng:2, ito:2 } },
-  ]},
-  { d:2, q:"你倾向哪种组织方式？", options:[
-    { t:"严密组织、铁的纪律。", s:{ mao:2, kim:2, chun:2, chen:1 } },
-    { t:"松散联盟、协商共治。", s:{ sun:2, kimku:1, liang:1, inukai:2 } },
-    { t:"个人魅力领导。", s:{ mao:1, jiang:1, qiujin:2 } },
-    { t:"制度化、程序化领导。", s:{ ito:2, okuma:2, gu:1, jing:1 } },
-  ]},
-  { d:2, q:"「效率」与「程序」之间，你更看重？", options:[
+{ d:2, q:"「效率」与「程序」之间，你更看重？", options:[
     { t:"效率优先。", s:{ yuan:2, park:2, tojo:2, chun:1 } },
     { t:"程序正义优先。", s:{ hu:2, gu:2, dae:2 } },
     { t:"两者尽量平衡。", s:{ zhou:2, deng:2, ito:1 } },
     { t:"理想高于效率。", s:{ sun:2, dazhao:2, qiujin:1 } },
   ]},
-  { d:2, q:"改革遇到巨大阻力，你会？", options:[
-    { t:"强推到底、不计代价。", s:{ park:2, chun:2, jiang:2 } },
-    { t:"分步妥协、循序渐进。", s:{ deng:2, liang:2, jing:2 } },
-    { t:"发动群众、形成声势。", s:{ mao:2, hong:2, kim:2 } },
-    { t:"借外力倒逼、顺势而为。", s:{ li:2, ito:2, meiji:1 } },
-  ]},
-  { d:2, q:"对待下属与民众，你倾向？", options:[
-    { t:"威严公正、赏罚分明。", s:{ zeng:2, jiang:2 } },
-    { t:"严刑峻法、令行禁止。", s:{ chun:2, park:2, kim:2, cixi:1 } },
-    { t:"亲民亲和、体恤百姓。", s:{ zhou:2, song:2, dae:2 } },
-    { t:"放手信任、以制度管人。", s:{ gu:2, ito:2, okuma:1 } },
-  ]},
-  { d:2, q:"你的时间观更接近？", options:[
+{ d:2, q:"你的时间观更接近？", options:[
     { t:"只争朝夕、时不我待。", s:{ mao:2, qiujin:2, chen:2 } },
     { t:"百年大计、循序渐进。", s:{ deng:2, ito:2, meiji:1, jing:1 } },
     { t:"功在当代、为后世奠基。", s:{ zeng:2, yuan:2, zuo:2 } },
     { t:"随机应变、见机行事。", s:{ li:2, kishi:2, longma:1 } },
   ]},
-  { d:2, q:"你希望给后世留下什么？", options:[
+{ d:2, q:"你希望给后世留下什么？", options:[
     { t:"制度与现代化。", s:{ ito:2, meiji:2, okuma:2, zhang:1 } },
     { t:"精神与理想。", s:{ luxun:2, dazhao:2, qiujin:2, sun:1 } },
     { t:"富强与稳定。", s:{ deng:2, park:2, ikeda:2, jing:1 } },
     { t:"民主与自由。", s:{ hu:2, dae:2, lee:2, wei:2, xian:1, inukai:1 } },
   ]},
-
-  // ===== 维度四：性格（15题）=====
-  { d:3, q:"你的性格更接近？", options:[
-    { t:"顽强坚韧，越挫越勇。", s:{ mao:2, sun:2, kimku:1, jiang:1 } },
-    { t:"自信果决，敢于出手。", s:{ togou:2, yuan:2, jiang:1, peng:1 } },
-    { t:"冷静深沉，深谋远虑。", s:{ zeng:2, li:2, ito:2, kishi:1 } },
-    { t:"激情理想，热血奔涌。", s:{ qiujin:2, hong:2, dazhao:2, longma:1 } },
-  ]},
-  { d:3, q:"面对危机，你通常会？", options:[
-    { t:"沉着应对，寻找转机。", s:{ zhou:2, deng:2, jing:2 } },
-    { t:"果断出手，先发制人。", s:{ togou:2, peng:2, tojo:2 } },
-    { t:"坚守原则，绝不退让。", s:{ an:2, sun:2, dazhao:2 } },
-    { t:"灵活变通，顺势而为。", s:{ li:2, ito:2, liang:2 } },
-  ]},
-  { d:3, q:"你更看重什么价值？", options:[
+{ d:2, q:"你更看重什么价值？", options:[
     { t:"效率与结果。", s:{ yuan:2, park:2, tojo:2 } },
     { t:"公平与正义。", s:{ song:2, dae:2, sun:2, dazhao:1 } },
     { t:"秩序与稳定。", s:{ zeng:2, cixi:2, chun:2, park:1 } },
     { t:"自由与个人权利。", s:{ hu:2, okuma:2, lee:2, fuze:1, wei:1 } },
   ]},
-  { d:3, q:"你的人生信条更接近？", options:[
+{ d:2, q:"你的人生信条更接近？", options:[
     { t:"「治大国若烹小鲜」，稳中求进。", s:{ deng:3 } },
     { t:"「天行健，自强不息」，绝不屈服。", s:{ mao:2, jiang:2, sun:1 } },
     { t:"「兼爱非攻」，仁爱和平。", s:{ song:2, kang:2, dae:2 } },
     { t:"「强权即公理」，实力说话。", s:{ yuan:2, tojo:2, yamagata:1 } },
     { t:"「苟利国家生死以」，以身许国。", s:{ lin:2, an:2, xixiang:1, zhangxueliang:1 } },
   ]},
-  { d:3, q:"面对诱惑与妥协，你会？", options:[
-    { t:"坚守底线，不为所动。", s:{ luxun:2, an:2, dazhao:2, sun:1 } },
-    { t:"灵活妥协，以退为进。", s:{ li:2, zhou:2, deng:2, liang:1 } },
-    { t:"强硬拒绝，寸步不让。", s:{ zuo:2, xixiang:2, mao:1 } },
-    { t:"权衡利弊，见机行事。", s:{ yuan:2, ito:2, kishi:1 } },
-  ]},
-  { d:3, q:"你的自信程度？", options:[
-    { t:"极度自信，舍我其谁。", s:{ mao:2, togou:2, jiang:2, yuan:1 } },
-    { t:"自信但务实。", s:{ deng:2, ito:2, park:2, jing:1 } },
-    { t:"谦逊内敛，不居功。", s:{ gu:2, zeng:2, ikeda:2 } },
-    { t:"信念坚定，毫不动摇。", s:{ qiujin:2, an:2, dazhao:2, kimku:1 } },
-  ]},
-  { d:3, q:"你的情绪风格更接近？", options:[
-    { t:"深藏不露，不动声色。", s:{ cixi:2, yuan:2, kishi:2, li:1 } },
-    { t:"激情外露，快意恩仇。", s:{ qiujin:2, hong:2, luxun:2 } },
-    { t:"沉着冷静，处变不惊。", s:{ zeng:2, gu:2, ikeda:2 } },
-    { t:"感染力强，激情演说。", s:{ mao:2, sun:2, liang:2, song:1 } },
-  ]},
-  { d:3, q:"对待风险，你倾向？", options:[
-    { t:"谨慎保守，稳字当头。", s:{ zeng:2, jing:2, ikeda:2 } },
-    { t:"敢于豪赌，孤注一掷。", s:{ yuan:2, togou:2, hong:2, zhangxueliang:2 } },
-    { t:"稳中求进，量力而行。", s:{ deng:2, ito:2, zhou:2 } },
-    { t:"为理想冒险，义无反顾。", s:{ qiujin:2, an:2, dazhao:2, longma:1 } },
-  ]},
-  { d:3, q:"你的独立性如何？", options:[
-    { t:"独立自主，不依附于人。", s:{ mao:2, jiang:2, kim:2, xixiang:1 } },
-    { t:"善用合作，借力打力。", s:{ zhou:2, li:2, ito:2, okuma:1 } },
-    { t:"追随理想与信仰。", s:{ dazhao:2, chen:1, sukh:1 } },
-    { t:"独立判断，坚持己见。", s:{ hu:2, luxun:2, gu:2 } },
-  ]},
-  { d:3, q:"你是理想主义者还是现实主义者？", options:[
+{ d:2, q:"你是理想主义者还是现实主义者？", options:[
     { t:"理想主义。", s:{ sun:2, qiujin:2, dazhao:2, song:2, hong:1 } },
     { t:"现实主义。", s:{ li:2, yuan:2, zeng:2, ito:1 } },
     { t:"务实的理想主义。", s:{ deng:2, zhou:2, liang:2, dae:2 } },
     { t:"强权现实。", s:{ tojo:2, yamagata:2, chun:1, park:1 } },
   ]},
-  { d:3, q:"面对批评，你会？", options:[
-    { t:"虚心纳谏，有则改之。", s:{ zhou:2, dae:2, okuma:2, inukai:1 } },
-    { t:"压制异议，不容挑战。", s:{ cixi:2, chun:2, kim:2, park:1 } },
-    { t:"有选择地听取。", s:{ deng:2, li:2, ito:2, jing:1 } },
-    { t:"坚持己见，不为所动。", s:{ mao:2, jiang:2, xixiang:1 } },
-  ]},
-  { d:3, q:"你给人的感觉是？", options:[
-    { t:"亲和、有魅力。", s:{ zhou:2, song:2, sun:2, liang:1 } },
-    { t:"严肃、有威严。", s:{ zeng:2, jiang:2, tojo:1 } },
-    { t:"平易近人。", s:{ deng:2, hu:2, dae:2, gu:1 } },
-    { t:"激情、有号召力。", s:{ mao:2, qiujin:2, hong:2 } },
-  ]},
-  { d:3, q:"你如何坚持一件长期的事？", options:[
-    { t:"当作终身事业，矢志不渝。", s:{ sun:2, mao:2, kimku:1, kim:1 } },
-    { t:"分阶段、有步骤地推进。", s:{ deng:2, ito:2, jing:2, meiji:1 } },
-    { t:"随时调整、灵活应变。", s:{ li:2, yuan:2, kishi:1 } },
-    { t:"功成之后、潇洒身退。", s:{ zhou:1, gu:1, longma:2 } },
-  ]},
-  { d:3, q:"面对孤独与逆境，你会？", options:[
-    { t:"在孤独中坚守理想。", s:{ dazhao:2, luxun:2, kimku:2, song:1 } },
-    { t:"忍辱负重，等待时机。", s:{ deng:2, li:2, mao:1, zhou:1 } },
-    { t:"绝不屈服，抗争到底。", s:{ xixiang:2, an:2, qiujin:2, sun:1 } },
-    { t:"淡然处之，宠辱不惊。", s:{ zeng:2, gu:2, ikeda:1 } },
-  ]},
-  { d:3, q:"你希望被后世记住为？", options:[
+{ d:2, q:"你希望被后世记住为？", options:[
     { t:"改革者。", s:{ deng:2, ito:2, jing:2, zhang:2 } },
     { t:"革命者。", s:{ mao:2, sun:2, qiujin:2, kim:1 } },
     { t:"独立／解放者。", s:{ kimku:2, an:2, sukh:2, lin:1 } },
     { t:"奠基者／强人。", s:{ meiji:2, yuan:2, zeng:2, park:1 } },
   ]},
+  // ===== 行事方式 =====
+{ d:3, q:"对外交往，你的方式更接近？", options:[
+    { t:"以夷制夷、借力打力。", s:{ li:2, ito:2, kishi:2 } },
+    { t:"强硬对抗、宁折不弯。", s:{ lin:2, zuo:2, mao:2, jiang:2 } },
+    { t:"谈判协商、和平解决。", s:{ zhou:2, gu:2, dae:2 } },
+    { t:"依附强国、寻求庇护。", s:{ rhee:2, kishi:1, yoshida:1 } },
+  ]},
+{ d:3, q:"对外谈判，你的风格？", options:[
+    { t:"强硬、寸步不让。", s:{ jiang:2, an:2, lin:2, zuo:1 } },
+    { t:"灵活、以柔克刚。", s:{ zhou:2, li:2, ito:2, deng:2 } },
+    { t:"讲求道义、以理服人。", s:{ gu:2, song:2, kang:2 } },
+    { t:"拖延周旋、待时而动。", s:{ yuan:2, cixi:1, li:1 } },
+  ]},
+{ d:3, q:"你达成目标的主要手段更接近？", options:[
+    { t:"谈判妥协、纵横捭阖。", s:{ li:2, zhou:2, ito:2 } },
+    { t:"武力强攻、雷霆手段。", s:{ togou:2, peng:2, tojo:2, xixiang:1 } },
+    { t:"革命暴动、武装起义。", s:{ sun:2, qiujin:2, hong:2, kim:1 } },
+    { t:"渐进改良、制度设计。", s:{ liang:2, hu:2, jing:2, ikeda:1 } },
+  ]},
+{ d:3, q:"做重大决策时，你更依赖？", options:[
+    { t:"理性计算与利益分析。", s:{ li:2, yuan:2, ito:2, kishi:1 } },
+    { t:"信念与理想。", s:{ sun:2, dazhao:2, song:2, qiujin:1 } },
+    { t:"直觉与个人决断。", s:{ mao:2, togou:2, jiang:1 } },
+    { t:"广泛征询、民主协商。", s:{ zhou:2, gu:2, okuma:2 } },
+  ]},
+{ d:3, q:"面对反对者，你通常会？", options:[
+    { t:"说服争取、凝聚共识。", s:{ zhou:2, liang:2, dae:2 } },
+    { t:"排除异己、坚决清除。", s:{ yuan:2, cixi:2, chun:2, kim:1 } },
+    { t:"分化瓦解、各个击破。", s:{ li:2, ito:2, kishi:2 } },
+    { t:"刚烈对抗、宁折不弯。", s:{ luxun:2, xixiang:2, an:2, peng:1 } },
+  ]},
+{ d:3, q:"你的用人风格是？", options:[
+    { t:"唯才是举、不拘一格。", s:{ zeng:2, jiang:2, meiji:2 } },
+    { t:"忠诚可靠优先。", s:{ mao:2, kim:2, chun:1, cixi:1 } },
+    { t:"平衡各方、协调关系。", s:{ li:2, zhou:2, ito:2 } },
+    { t:"敢用有争议的人才。", s:{ deng:2, yuan:2, park:2 } },
+  ]},
+{ d:3, q:"你做事的计划性如何？", options:[
+    { t:"长远规划、步步为营。", s:{ deng:2, ito:2, meiji:2, zhang:1 } },
+    { t:"当机立断、抓住战机。", s:{ togou:2, yuan:2, longma:2 } },
+    { t:"理想驱动、随势而动。", s:{ qiujin:2, hong:2, dazhao:1 } },
+    { t:"制度保障、按部就班。", s:{ okuma:2, gu:2, ikeda:1 } },
+  ]},
+{ d:3, q:"对规则的运用，你倾向？", options:[
+    { t:"制定规则、约束他人。", s:{ meiji:2, ito:2, yuan:2 } },
+    { t:"严格遵守既有规则。", s:{ gu:2, hu:2, dae:2 } },
+    { t:"变通规则、达成目的。", s:{ li:2, deng:2, kishi:2 } },
+    { t:"打破规则、破旧立新。", s:{ mao:2, chen:2, luxun:2, hong:1 } },
+  ]},
+{ d:3, q:"危机中的领导方式？", options:[
+    { t:"沉着稳舵、凝聚人心。", s:{ zhou:2, jing:2, ikeda:2 } },
+    { t:"果断强硬、当机立断。", s:{ togou:2, peng:2, chun:2, tojo:1 } },
+    { t:"坚守原则、绝不妥协。", s:{ sun:2, dazhao:2, an:2 } },
+    { t:"灵活应变、随机调整。", s:{ li:2, deng:2, ito:2 } },
+  ]},
+{ d:3, q:"你倾向哪种组织方式？", options:[
+    { t:"严密组织、铁的纪律。", s:{ mao:2, kim:2, chun:2, chen:1 } },
+    { t:"松散联盟、协商共治。", s:{ sun:2, kimku:1, liang:1, inukai:2 } },
+    { t:"个人魅力领导。", s:{ mao:1, jiang:1, qiujin:2 } },
+    { t:"制度化、程序化领导。", s:{ ito:2, okuma:2, gu:1, jing:1 } },
+  ]},
+{ d:3, q:"改革遇到巨大阻力，你会？", options:[
+    { t:"强推到底、不计代价。", s:{ park:2, chun:2, jiang:2 } },
+    { t:"分步妥协、循序渐进。", s:{ deng:2, liang:2, jing:2 } },
+    { t:"发动群众、形成声势。", s:{ mao:2, hong:2, kim:2 } },
+    { t:"借外力倒逼、顺势而为。", s:{ li:2, ito:2, meiji:1 } },
+  ]},
+{ d:3, q:"对待下属与民众，你倾向？", options:[
+    { t:"威严公正、赏罚分明。", s:{ zeng:2, jiang:2 } },
+    { t:"严刑峻法、令行禁止。", s:{ chun:2, park:2, kim:2, cixi:1 } },
+    { t:"亲民亲和、体恤百姓。", s:{ zhou:2, song:2, dae:2 } },
+    { t:"放手信任、以制度管人。", s:{ gu:2, ito:2, okuma:1 } },
+  ]},
+  // ===== 性格气质 =====
+{ d:4, q:"面对失败，你通常会？", options:[
+    { t:"越挫越勇、永不言弃。", s:{ sun:2, mao:2, kimku:2, an:1 } },
+    { t:"反思复盘、调整策略。", s:{ liang:2, deng:2, zhou:2 } },
+    { t:"宁为玉碎、不为瓦全。", s:{ xixiang:2, qiujin:2, an:2 } },
+    { t:"隐忍待时、东山再起。", s:{ li:2, zeng:2, mao:1 } },
+  ]},
+{ d:4, q:"你的性格更接近？", options:[
+    { t:"顽强坚韧，越挫越勇。", s:{ mao:2, sun:2, kimku:1, jiang:1 } },
+    { t:"自信果决，敢于出手。", s:{ togou:2, yuan:2, jiang:1, peng:1 } },
+    { t:"冷静深沉，深谋远虑。", s:{ zeng:2, li:2, ito:2, kishi:1 } },
+    { t:"激情理想，热血奔涌。", s:{ qiujin:2, hong:2, dazhao:2, longma:1 } },
+  ]},
+{ d:4, q:"面对危机，你通常会？", options:[
+    { t:"沉着应对，寻找转机。", s:{ zhou:2, deng:2, jing:2 } },
+    { t:"果断出手，先发制人。", s:{ togou:2, peng:2, tojo:2 } },
+    { t:"坚守原则，绝不退让。", s:{ an:2, sun:2, dazhao:2 } },
+    { t:"灵活变通，顺势而为。", s:{ li:2, ito:2, liang:2 } },
+  ]},
+{ d:4, q:"面对诱惑与妥协，你会？", options:[
+    { t:"坚守底线，不为所动。", s:{ luxun:2, an:2, dazhao:2, sun:1 } },
+    { t:"灵活妥协，以退为进。", s:{ li:2, zhou:2, deng:2, liang:1 } },
+    { t:"强硬拒绝，寸步不让。", s:{ zuo:2, xixiang:2, mao:1 } },
+    { t:"权衡利弊，见机行事。", s:{ yuan:2, ito:2, kishi:1 } },
+  ]},
+{ d:4, q:"你的自信程度？", options:[
+    { t:"极度自信，舍我其谁。", s:{ mao:2, togou:2, jiang:2, yuan:1 } },
+    { t:"自信但务实。", s:{ deng:2, ito:2, park:2, jing:1 } },
+    { t:"谦逊内敛，不居功。", s:{ gu:2, zeng:2, ikeda:2 } },
+    { t:"信念坚定，毫不动摇。", s:{ qiujin:2, an:2, dazhao:2, kimku:1 } },
+  ]},
+{ d:4, q:"你的情绪风格更接近？", options:[
+    { t:"深藏不露，不动声色。", s:{ cixi:2, yuan:2, kishi:2, li:1 } },
+    { t:"激情外露，快意恩仇。", s:{ qiujin:2, hong:2, luxun:2 } },
+    { t:"沉着冷静，处变不惊。", s:{ zeng:2, gu:2, ikeda:2 } },
+    { t:"感染力强，激情演说。", s:{ mao:2, sun:2, liang:2, song:1 } },
+  ]},
+{ d:4, q:"对待风险，你倾向？", options:[
+    { t:"谨慎保守，稳字当头。", s:{ zeng:2, jing:2, ikeda:2 } },
+    { t:"敢于豪赌，孤注一掷。", s:{ yuan:2, togou:2, hong:2, zhangxueliang:2 } },
+    { t:"稳中求进，量力而行。", s:{ deng:2, ito:2, zhou:2 } },
+    { t:"为理想冒险，义无反顾。", s:{ qiujin:2, an:2, dazhao:2, longma:1 } },
+  ]},
+{ d:4, q:"你的独立性如何？", options:[
+    { t:"独立自主，不依附于人。", s:{ mao:2, jiang:2, kim:2, xixiang:1 } },
+    { t:"善用合作，借力打力。", s:{ zhou:2, li:2, ito:2, okuma:1 } },
+    { t:"追随理想与信仰。", s:{ dazhao:2, chen:1, sukh:1 } },
+    { t:"独立判断，坚持己见。", s:{ hu:2, luxun:2, gu:2 } },
+  ]},
+{ d:4, q:"面对批评，你会？", options:[
+    { t:"虚心纳谏，有则改之。", s:{ zhou:2, dae:2, okuma:2, inukai:1 } },
+    { t:"压制异议，不容挑战。", s:{ cixi:2, chun:2, kim:2, park:1 } },
+    { t:"有选择地听取。", s:{ deng:2, li:2, ito:2, jing:1 } },
+    { t:"坚持己见，不为所动。", s:{ mao:2, jiang:2, xixiang:1 } },
+  ]},
+{ d:4, q:"你给人的感觉是？", options:[
+    { t:"亲和、有魅力。", s:{ zhou:2, song:2, sun:2, liang:1 } },
+    { t:"严肃、有威严。", s:{ zeng:2, jiang:2, tojo:1 } },
+    { t:"平易近人。", s:{ deng:2, hu:2, dae:2, gu:1 } },
+    { t:"激情、有号召力。", s:{ mao:2, qiujin:2, hong:2 } },
+  ]},
+{ d:4, q:"你如何坚持一件长期的事？", options:[
+    { t:"当作终身事业，矢志不渝。", s:{ sun:2, mao:2, kimku:1, kim:1 } },
+    { t:"分阶段、有步骤地推进。", s:{ deng:2, ito:2, jing:2, meiji:1 } },
+    { t:"随时调整、灵活应变。", s:{ li:2, yuan:2, kishi:1 } },
+    { t:"功成之后、潇洒身退。", s:{ zhou:1, gu:1, longma:2 } },
+  ]},
+{ d:4, q:"面对孤独与逆境，你会？", options:[
+    { t:"在孤独中坚守理想。", s:{ dazhao:2, luxun:2, kimku:2, song:1 } },
+    { t:"忍辱负重，等待时机。", s:{ deng:2, li:2, mao:1, zhou:1 } },
+    { t:"绝不屈服，抗争到底。", s:{ xixiang:2, an:2, qiujin:2, sun:1 } },
+    { t:"淡然处之，宠辱不惊。", s:{ zeng:2, gu:2, ikeda:1 } },
+  ]}
 ];
 
 let current = 0;
