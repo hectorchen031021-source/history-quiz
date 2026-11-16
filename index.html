@@ -55,7 +55,12 @@
     border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px;
     font-size: 12px; margin: 2px 4px 2px 0; letter-spacing: .02em;
   }
-  .opt-list { margin-top: 24px; text-align: left; display: flex; flex-direction: column; gap: 10px; }
+  .len-list { margin-top: 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .len-label { font-size: 14px; font-weight: 600; color: var(--ink); margin-right: 4px; }
+  .len-opt { display: flex; align-items: center; gap: 6px; cursor: pointer; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 13px; color: var(--ink); transition: border-color .16s ease; }
+  .len-opt:hover { border-color: var(--line-strong); }
+  .len-opt input { accent-color: var(--accent); cursor: pointer; }
+  .opt-list { margin-top: 16px; text-align: left; display: flex; flex-direction: column; gap: 10px; }
   .opt-toggle { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; transition: border-color .16s ease; }
   .opt-toggle:hover { border-color: var(--line-strong); }
   .opt-toggle input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; margin-top: 2px; }
@@ -195,6 +200,12 @@
       <div class="kicker">历史人格测试</div>
       <h1>你像哪位东亚历史人物？</h1>
        <p class="sub">收录 <b>1800 年以后</b>的 <b>300 位东亚历史人物</b>（中国 · 日本 · 韩国 · 朝鲜 · 蒙古 · 台湾），从<span class="tag">经济政治倾向</span><span class="tag">国际与外交观</span><span class="tag">价值取向</span><span class="tag">行事方式</span><span class="tag">性格气质</span>五个维度、共 <b>80 道题</b>，测出与你最相似的那一位。</p>
+       <div class="len-list">
+         <span class="len-label">基础题量</span>
+         <label class="len-opt"><input type="radio" name="qlen" value="35" onchange="updateOptCount()"><span>精简 35 题</span></label>
+         <label class="len-opt"><input type="radio" name="qlen" value="50" onchange="updateOptCount()"><span>标准 50 题</span></label>
+         <label class="len-opt"><input type="radio" name="qlen" value="80" checked onchange="updateOptCount()"><span>完整 80 题</span></label>
+       </div>
        <div class="opt-list">
          <label class="opt-toggle" for="optToggleJp">
            <input type="checkbox" id="optToggleJp" checked onchange="updateOptCount()">
@@ -3392,7 +3403,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -3511,7 +3523,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -3619,7 +3632,8 @@ const questions = [
      "wusanlian": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -3716,7 +3730,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 0,
@@ -3791,7 +3806,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 0,
@@ -3936,7 +3952,8 @@ const questions = [
      "tsurumi": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 0,
@@ -4128,7 +4145,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -4214,7 +4232,8 @@ const questions = [
      "wangyunwu": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 0,
@@ -4305,7 +4324,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 0,
@@ -4413,7 +4433,8 @@ const questions = [
      "wangyunwu": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 0,
@@ -4510,7 +4531,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 0,
@@ -4604,7 +4626,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -4730,7 +4753,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -4843,7 +4867,8 @@ const questions = [
      "kimjwajin": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 1,
@@ -4972,7 +4997,8 @@ const questions = [
      "xiexuehong": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 1,
@@ -5097,7 +5123,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 1,
@@ -5201,7 +5228,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 1,
@@ -5331,7 +5359,8 @@ const questions = [
      "jiangzhujun": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 1,
@@ -5433,7 +5462,8 @@ const questions = [
      "xiexuehong": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -5547,7 +5577,8 @@ const questions = [
      "jiangzhujun": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 1,
@@ -5660,7 +5691,8 @@ const questions = [
      "tsurumi": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -5781,7 +5813,8 @@ const questions = [
      "shingyusik": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -5886,7 +5919,8 @@ const questions = [
      "yunposun": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -6001,7 +6035,8 @@ const questions = [
      "shiratori": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 2,
@@ -6132,7 +6167,8 @@ const questions = [
      "chenwencheng": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 2,
@@ -6276,7 +6312,8 @@ const questions = [
      "naito": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 2,
@@ -6417,7 +6454,8 @@ const questions = [
      "zhangzhizhong": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 2,
@@ -6534,7 +6572,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 2,
@@ -6646,7 +6685,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 2,
@@ -6766,7 +6806,8 @@ const questions = [
      "qiufengjia": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 2,
@@ -6860,7 +6901,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 2,
@@ -7003,7 +7045,8 @@ const questions = [
      "wusanlian": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 2,
@@ -7134,7 +7177,8 @@ const questions = [
      "wangyunwu": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 2,
@@ -7281,7 +7325,8 @@ const questions = [
      "kimjwajin": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 2,
@@ -7407,7 +7452,8 @@ const questions = [
      "shiratori": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 2,
@@ -7515,7 +7561,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 3,
@@ -7626,7 +7673,8 @@ const questions = [
      "nakasone": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 3,
@@ -7730,7 +7778,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 3,
@@ -7840,7 +7889,8 @@ const questions = [
      "wangyunwu": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 3,
@@ -7962,7 +8012,8 @@ const questions = [
      "yejianying": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 3,
@@ -8085,7 +8136,8 @@ const questions = [
      "bakmokwol": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 3,
@@ -8190,7 +8242,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 3,
@@ -8268,7 +8321,8 @@ const questions = [
      "ashida": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 3,
@@ -8422,7 +8476,8 @@ const questions = [
      "bakmokwol": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 3,
@@ -8519,7 +8574,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 3,
@@ -8658,7 +8714,8 @@ const questions = [
      "ashida": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 3,
@@ -8749,7 +8806,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 3,
@@ -8845,7 +8903,8 @@ const questions = [
      "ashida": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 4,
@@ -8968,7 +9027,8 @@ const questions = [
      "jiangzhujun": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 4,
@@ -9110,7 +9170,8 @@ const questions = [
      "linboqu": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 4,
@@ -9203,7 +9264,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 4,
@@ -9343,7 +9405,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 4,
@@ -9474,7 +9537,8 @@ const questions = [
      "shingyusik": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 4,
@@ -9614,7 +9678,8 @@ const questions = [
      "qiufengjia": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 4,
@@ -9696,7 +9761,8 @@ const questions = [
      "kimjwajin": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 4,
@@ -9868,7 +9934,8 @@ const questions = [
      "bakmokwol": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 4,
@@ -9979,7 +10046,8 @@ const questions = [
      "zhangzhizhong": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 4,
@@ -10131,7 +10199,8 @@ const questions = [
      "jiangzhujun": 2
     }
    }
-  ]
+  ],
+  "rank": 2
  },
  {
   "d": 4,
@@ -10230,7 +10299,8 @@ const questions = [
      "yejianying": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 4,
@@ -10389,7 +10459,8 @@ const questions = [
      "ashida": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -10625,7 +10696,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -10825,7 +10897,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 1,
@@ -11009,7 +11082,8 @@ const questions = [
      "tsurumi": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 1,
@@ -11170,7 +11244,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 2,
@@ -11336,7 +11411,8 @@ const questions = [
      "bakmokwol": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 2,
@@ -11609,7 +11685,8 @@ const questions = [
      "bakmokwol": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 3,
@@ -11734,7 +11811,8 @@ const questions = [
      "shingyusik": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 3,
@@ -11877,7 +11955,8 @@ const questions = [
      "wangyunwu": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 4,
@@ -12008,7 +12087,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 4,
@@ -12147,7 +12227,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -12296,7 +12377,8 @@ const questions = [
      "naito": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 1,
@@ -12432,7 +12514,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -12603,7 +12686,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 1,
@@ -12756,7 +12840,8 @@ const questions = [
      "chenwencheng": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -12904,7 +12989,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 3,
@@ -13032,7 +13118,8 @@ const questions = [
      "kongxiangxi": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -13162,7 +13249,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 3
  },
  {
   "d": 2,
@@ -13337,7 +13425,8 @@ const questions = [
      "choenamseon": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 3,
@@ -13587,7 +13676,8 @@ const questions = [
      "lixiannian": 2
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 4,
@@ -13704,7 +13794,8 @@ const questions = [
      "zhangxueliang": 1
     }
    }
-  ]
+  ],
+  "rank": 1
  },
  {
   "d": 0,
@@ -15356,7 +15447,7 @@ const questions = [
      "peng",
      "chenyun",
      "deng",
-          "lixiannian"
+     "lixiannian"
     ]
    },
    {
@@ -17296,15 +17387,19 @@ function buildOptList() {
 }
 
 function updateOptCount() {
-  const base = questions.filter(q => !q.optional).length;
+  const len = +document.querySelector('input[name="qlen"]:checked').value;
+  const maxRank = len === 35 ? 1 : (len === 50 ? 2 : 3);
+  const base = questions.filter(q => !q.optional && q.rank <= maxRank).length;
   const regions = { jp: document.getElementById('optToggleJp').checked, cn: document.getElementById('optToggleCn').checked, tw: document.getElementById('optToggleTw').checked };
   const n = questions.filter(q => q.optional && regions[q.region]).length;
   document.getElementById('startBtn').textContent = '开始测试（' + (base + n) + ' 题）';
 }
 
 function startQuiz() {
+  const len = +document.querySelector('input[name="qlen"]:checked').value;
+  const maxRank = len === 35 ? 1 : (len === 50 ? 2 : 3);
   const regions = { jp: document.getElementById('optToggleJp').checked, cn: document.getElementById('optToggleCn').checked, tw: document.getElementById('optToggleTw').checked };
-  activeQuestions = questions.filter(q => !q.optional || regions[q.region]);
+  activeQuestions = questions.filter(q => q.optional ? regions[q.region] : q.rank <= maxRank);
   document.getElementById('intro').classList.add('hidden');
   document.getElementById('quiz').classList.remove('hidden');
   current = 0; scores = {}; answers = [];
