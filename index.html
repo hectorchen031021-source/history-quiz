@@ -56,14 +56,12 @@
     font-size: 12px; margin: 2px 4px 2px 0; letter-spacing: .02em;
   }
   .opt-list { margin-top: 24px; text-align: left; }
-  .opt-head { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-  .opt-count { font-size: 12px; font-weight: 500; color: var(--muted); }
-  .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
-  .opt-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); cursor: pointer; padding: 5px 8px; border-radius: 8px; transition: background .14s ease; }
-  .opt-item:hover { background: var(--bg); }
-  .opt-item input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex: none; }
-  .opt-item span { line-height: 1.4; }
-  @media (max-width: 560px) { .opt-grid { grid-template-columns: 1fr; } }
+  .opt-toggle { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; transition: border-color .16s ease; }
+  .opt-toggle:hover { border-color: var(--line-strong); }
+  .opt-toggle input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; margin-top: 2px; }
+  .opt-toggle-box { display: flex; flex-direction: column; gap: 4px; }
+  .opt-toggle-box strong { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .opt-toggle-desc { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
 
   .q-num { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-family: var(--font-text); }
   .dim-tag {
@@ -195,8 +193,13 @@
       <h1>你像哪位东亚历史人物？</h1>
        <p class="sub">收录 <b>1800 年以后</b>的 <b>300 位东亚历史人物</b>（中国 · 日本 · 韩国 · 朝鲜 · 蒙古 · 台湾），从<span class="tag">经济政治倾向</span><span class="tag">国际与外交观</span><span class="tag">价值取向</span><span class="tag">行事方式</span><span class="tag">性格气质</span>五个维度、共 <b>80 道题</b>，测出与你最相似的那一位。</p>
        <div class="opt-list">
-         <div class="opt-head">进阶可选题目 <span class="opt-count" id="optCount"></span></div>
-         <div id="optWrap" class="opt-grid"></div>
+         <label class="opt-toggle" for="optToggle">
+           <input type="checkbox" id="optToggle" checked onchange="updateOptCount()">
+           <span class="opt-toggle-box">
+             <strong>进阶题库（30 题）</strong>
+             <span class="opt-toggle-desc">历史立场专题：改革开放、北进南进、改造法案大纲、二二六事件、政变、共荣圈、满洲国等强 tag 题。勾选后计入测试，不勾选则只做 80 道基础题。</span>
+           </span>
+         </label>
        </div>
        <div style="margin-top:24px">
          <button class="btn" onclick="startQuiz()" id="startBtn">开始测试</button>
@@ -15647,6 +15650,1081 @@ const questions = [
     }
    }
   ]
+ },
+ {
+  "d": 1,
+  "optional": true,
+  "q": "对「总体战体制」与国家总动员，你的态度？",
+  "options": [
+   {
+    "t": "支持，国家力量全面统制。",
+    "s": {
+     "nagata": 2,
+     "tojo": 2,
+     "yamagata": 2
+    },
+    "exclude": [
+     "yonai",
+     "inoue",
+     "yoshida",
+     "okuma",
+     "hara",
+     "saionji",
+     "ozaki",
+     "hatoyama",
+     "okada",
+     "saito",
+     "suzuki",
+     "mikasa",
+     "yoshino",
+     "konoe",
+     "jangmyeon"
+    ]
+   },
+   {
+    "t": "反对，保留民间与个人自由。",
+    "s": {
+     "yonai": 2,
+     "inoue": 2,
+     "yoshida": 1,
+     "okuma": 1
+    },
+    "exclude": [
+     "nagata",
+     "tojo",
+     "yamagata",
+     "araki",
+     "katsura",
+     "tanaka",
+     "masaki",
+     "matsuoka",
+     "kita",
+     "ishiwara",
+     "itagaki",
+     "doihara",
+     "matsui",
+     "hirota",
+     "hiranuma",
+     "anami",
+     "yamashita",
+     "onishi",
+     "okawa",
+     "minami",
+     "hata",
+     "okamura",
+     "honjo",
+     "shiratori",
+     "kodama",
+     "uchida",
+     "toyama",
+     "hashimoto",
+     "nogi",
+     "mishima"
+    ]
+   },
+   {
+    "t": "有限动员，战时就地取材。",
+    "s": {
+     "ito": 1,
+     "jiang": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 0,
+  "optional": true,
+  "q": "对日本战后「和平宪法」，你的态度？",
+  "options": [
+   {
+    "t": "护宪，坚持放弃战争。",
+    "s": {
+     "yoshida": 2,
+     "ashida": 2,
+     "inoue": 1,
+     "mikasa": 1
+    },
+    "exclude": [
+     "kishi",
+     "nakasone",
+     "hatoyama",
+     "tojo",
+     "yamagata",
+     "nagata",
+     "yonai",
+     "okada",
+     "saito",
+     "suzuki",
+     "inoue",
+     "mikasa",
+     "tanaka",
+     "matsuoka",
+     "kita",
+     "ishiwara",
+     "itagaki",
+     "doihara",
+     "matsui",
+     "hirota",
+     "hiranuma",
+     "anami",
+     "yamashita",
+     "onishi",
+     "okawa",
+     "minami",
+     "hata",
+     "okamura",
+     "honjo",
+     "shiratori",
+     "kodama",
+     "katsura",
+     "uchida",
+     "toyama",
+     "hashimoto"
+    ]
+   },
+   {
+    "t": "改宪，恢复自主武装。",
+    "s": {
+     "kishi": 2,
+     "nakasone": 2,
+     "hatoyama": 1
+    },
+    "exclude": [
+     "yoshida",
+     "ashida",
+     "inoue",
+     "mikasa",
+     "uchimura",
+     "katayamatetsu",
+     "ozaki",
+     "hatoyama",
+     "yonai",
+     "okada",
+     "saito",
+     "suzuki",
+     "wutingfang",
+     "shidehara",
+     "shigemitsu",
+     "nitobe",
+     "kimgyusik",
+     "bingxin",
+     "yosano",
+     "hiratsuka",
+     "tokuromi",
+     "zhanglan",
+     "kimyoungsam",
+     "rohmoo",
+     "chosan",
+     "mikitakeo",
+     "shenjunru",
+     "zhangnaiqi",
+     "guoyuxin",
+     "chenwencheng",
+     "jangmyeon"
+    ]
+   },
+   {
+    "t": "折中，保留象征但增强防卫。",
+    "s": {
+     "ikeda": 1,
+     "sato": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 1,
+  "optional": true,
+  "q": "对「征韩论」与大陆扩张，你的立场？",
+  "options": [
+   {
+    "t": "支持征韩，向大陆扩张。",
+    "s": {
+     "xixiang": 2,
+     "tojo": 2,
+     "yamagata": 1
+    },
+    "exclude": [
+     "ito",
+     "okuma",
+     "kimku",
+     "an",
+     "sun",
+     "mao",
+     "kimwonbong",
+     "kimjwajin",
+     "saionji",
+     "konoe",
+     "hara",
+     "yoshino",
+     "ahnchangho",
+     "yeoun",
+     "leebeomseok",
+     "kimhyungjik",
+     "sonkeechung",
+     "bakeunsik",
+     "zhaosoang",
+     "shingyusik",
+     "shinchaeho",
+     "yunbonggil",
+     "hongbeomdo",
+     "yu",
+     "monarudao",
+     "huang",
+     "liaozhongkai",
+     "dengyanda",
+     "hexiangning",
+     "miyazaki",
+     "qiufengjia",
+     "zhude",
+     "linbiao",
+     "yangjingyu",
+     "yeting",
+     "suyu",
+     "chenyi",
+     "zuoquan",
+     "chengeng",
+     "helong",
+     "liubocheng",
+     "xuxiangqian",
+     "nierongzhen",
+     "fangzhimin",
+     "yangkaihui",
+     "zhaoyiman",
+     "jiangzhujun"
+    ]
+   },
+   {
+    "t": "反对，先内治后外征。",
+    "s": {
+     "ito": 2,
+     "okuma": 2
+    },
+    "exclude": [
+     "xixiang",
+     "tojo",
+     "yamagata",
+     "toyama",
+     "uchida",
+     "okawa",
+     "nogi",
+     "mishima",
+     "araki",
+     "masaki",
+     "tanaka",
+     "matsuoka",
+     "kita",
+     "nagata",
+     "ishiwara",
+     "itagaki",
+     "doihara",
+     "matsui",
+     "hirota",
+     "hiranuma",
+     "anami",
+     "yamashita",
+     "onishi",
+     "minami",
+     "hata",
+     "okamura",
+     "honjo",
+     "shiratori",
+     "kodama",
+     "katsura",
+     "hashimoto"
+    ]
+   },
+   {
+    "t": "不置可否。",
+    "s": {
+     "li": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 1,
+  "optional": true,
+  "q": "对台湾的日据与光复，你的立场？",
+  "options": [
+   {
+    "t": "认同日本殖民经营。",
+    "s": {
+     "kodama": 2,
+     "itagaki": 1,
+     "doihara": 1
+    },
+    "exclude": [
+     "qiufengjia",
+     "laihe",
+     "wei",
+     "xian",
+     "monarudao",
+     "jiang",
+     "mao",
+     "linmosheng",
+     "yangku",
+     "wuzhuoliu",
+     "xiexuehong",
+     "huang",
+     "liaozhongkai",
+     "dengyanda",
+     "hexiangning",
+     "miyazaki",
+     "zhangtaiyan",
+     "laoshe",
+     "bajin",
+     "wenyiduo",
+     "yudafu",
+     "soseki",
+     "akutagawa",
+     "kawabata",
+     "dazai",
+     "yundongju",
+     "leegwangsu",
+     "yeom",
+     "damdinsuren",
+     "shencongwen",
+     "zhangailing",
+     "xiaohong",
+     "higuchi",
+     "nakajima",
+     "kimsoyol",
+     "yisang",
+     "tanizaki",
+     "shiga",
+     "arishima",
+     "yokomitsu",
+     "satoharuo",
+     "kobayashihideo",
+     "hayashi",
+     "takeuchi",
+     "zhouzuoren",
+     "zhuziqing",
+     "caoyu",
+     "zhangwojun",
+     "zhonglihe",
+     "bakmokwol",
+     "caipeihuo",
+     "wusanlian",
+     "shinchaeho",
+     "yunbonggil",
+     "hongbeomdo",
+     "yu",
+     "kimwonbong",
+     "kimjwajin",
+     "cai",
+     "feng",
+     "baichongxi",
+     "chencheng",
+     "zhangzizhong",
+     "caitingkai",
+     "daijitao",
+     "chenbulei",
+     "songmeiling",
+     "xueyue",
+     "sunliren",
+     "chenlifu",
+     "fuzuoyi",
+     "duyuming",
+     "zhanglingfu",
+     "heyingqin",
+     "lizongren",
+     "chenguofu",
+     "zhangzhizhong",
+     "zhude",
+     "linbiao",
+     "yangjingyu",
+     "yeting",
+     "suyu",
+     "chenyi",
+     "zuoquan",
+     "chengeng",
+     "helong",
+     "liubocheng",
+     "xuxiangqian",
+     "nierongzhen",
+     "fangzhimin",
+     "yangkaihui",
+     "zhaoyiman",
+     "jiangzhujun",
+     "guomoruo",
+     "wuyuzhang",
+     "dingling",
+     "xiangjingyu",
+     "kotoku",
+     "osugi",
+     "kobayashi",
+     "miyamoto",
+     "zhangwentian",
+     "wangming",
+     "maodun"
+    ]
+   },
+   {
+    "t": "坚决抗日，光复台湾。",
+    "s": {
+     "qiufengjia": 2,
+     "laihe": 2,
+     "wei": 1,
+     "monarudao": 2,
+     "jiang": 1,
+     "mao": 1
+    },
+    "exclude": [
+     "kodama",
+     "itagaki",
+     "doihara",
+     "matsui",
+     "okamura",
+     "honjo",
+     "minami",
+     "hata",
+     "katsura",
+     "uchida",
+     "toyama",
+     "hashimoto",
+     "tanaka",
+     "matsuoka",
+     "kita",
+     "nagata",
+     "ishiwara",
+     "hirota",
+     "hiranuma",
+     "anami",
+     "yamashita",
+     "onishi",
+     "okawa",
+     "shiratori"
+    ]
+   },
+   {
+    "t": "和平争取自治。",
+    "s": {
+     "xian": 2,
+     "caipeihuo": 1,
+     "wusanlian": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 1,
+  "optional": true,
+  "q": "对「日德意三国同盟」，你的态度？",
+  "options": [
+   {
+    "t": "支持，缔结轴心同盟。",
+    "s": {
+     "matsuoka": 2,
+     "shiratori": 2,
+     "tojo": 1,
+     "hiranuma": 1
+    },
+    "exclude": [
+     "yonai",
+     "inoue",
+     "mikasa",
+     "yoshida",
+     "saito",
+     "okada",
+     "shidehara",
+     "hatoyama",
+     "suzuki",
+     "wutingfang",
+     "shigemitsu",
+     "nitobe",
+     "kimgyusik",
+     "ashida"
+    ]
+   },
+   {
+    "t": "反对，应联英美协调。",
+    "s": {
+     "yonai": 2,
+     "inoue": 2,
+     "mikasa": 1,
+     "yoshida": 1
+    },
+    "exclude": [
+     "matsuoka",
+     "shiratori",
+     "tojo",
+     "hiranuma",
+     "kita",
+     "okawa",
+     "tanaka",
+     "nagata",
+     "ishiwara",
+     "itagaki",
+     "doihara",
+     "matsui",
+     "hirota",
+     "anami",
+     "yamashita",
+     "onishi",
+     "minami",
+     "hata",
+     "okamura",
+     "honjo"
+    ]
+   },
+   {
+    "t": "中立，不结盟。",
+    "s": {
+     "ishibashi": 1,
+     "shigemitsu": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 4,
+  "optional": true,
+  "q": "对侵略战争的反省，你的态度？",
+  "options": [
+   {
+    "t": "深刻反省，承担责任。",
+    "s": {
+     "mikasa": 2,
+     "inoue": 2,
+     "uchimura": 1,
+     "dae": 1,
+     "zhou": 1
+    },
+    "exclude": [
+     "tojo",
+     "yamagata",
+     "nagata",
+     "okamura",
+     "matsui",
+     "hiranuma",
+     "hashimoto",
+     "onishi",
+     "tanaka",
+     "matsuoka",
+     "kita",
+     "ishiwara",
+     "itagaki",
+     "doihara",
+     "hirota",
+     "anami",
+     "yamashita",
+     "okawa",
+     "minami",
+     "hata",
+     "honjo",
+     "shiratori",
+     "kodama",
+     "katsura",
+     "uchida",
+     "toyama"
+    ]
+   },
+   {
+    "t": "民族主义，拒绝过度反省。",
+    "s": {
+     "tojo": 2,
+     "yamagata": 2,
+     "nagata": 1,
+     "kishi": 1
+    },
+    "exclude": [
+     "mikasa",
+     "inoue",
+     "uchimura",
+     "dae",
+     "zhou",
+     "tokuromi",
+     "hatoyama",
+     "yonai",
+     "okada",
+     "saito",
+     "suzuki",
+     "bingxin",
+     "yosano",
+     "hiratsuka",
+     "zhanglan",
+     "kimyoungsam",
+     "rohmoo",
+     "chosan",
+     "mikitakeo",
+     "katayamatetsu",
+     "shenjunru",
+     "zhangnaiqi",
+     "guoyuxin",
+     "chenwencheng",
+     "dengyingchao",
+     "yejianying"
+    ]
+   },
+   {
+    "t": "正视历史，但向前看。",
+    "s": {
+     "yoshida": 1,
+     "ashida": 1
+    }
+   },
+   {
+    "t": "不置可否。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 0,
+  "optional": true,
+  "q": "对土地改革（没收地主、分田于民），你的态度？",
+  "options": [
+   {
+    "t": "支持彻底土改。",
+    "s": {
+     "mao": 2,
+     "chen": 2,
+     "kim": 2,
+     "sun": 1
+    },
+    "exclude": [
+     "zeng",
+     "cixi",
+     "li",
+     "zhang",
+     "kongxiangxi",
+     "songziwen",
+     "chenlifu",
+     "chenguofu",
+     "wangguowei",
+     "qianmu",
+     "wengtonghe",
+     "lianheng",
+     "yanagita",
+     "naito",
+     "ronglu",
+     "shengxuanhuai",
+     "tangshaoyi",
+     "huangzunxian",
+     "zhangjian",
+     "zhantianyou",
+     "shibusawa",
+     "cai",
+     "feng",
+     "baichongxi",
+     "chencheng",
+     "zhangzizhong",
+     "caitingkai",
+     "daijitao",
+     "chenbulei",
+     "songmeiling",
+     "xueyue",
+     "sunliren",
+     "fuzuoyi",
+     "duyuming",
+     "zhanglingfu",
+     "heyingqin",
+     "lizongren",
+     "zhangzhizhong"
+    ]
+   },
+   {
+    "t": "温和改良，保护产权。",
+    "s": {
+     "zeng": 2,
+     "cixi": 1,
+     "li": 1,
+     "zhang": 1
+    },
+    "exclude": [
+     "mao",
+     "chen",
+     "kim",
+     "dingling",
+     "guomoruo",
+     "xiexuehong",
+     "zhude",
+     "linbiao",
+     "yangjingyu",
+     "yeting",
+     "suyu",
+     "chenyi",
+     "zuoquan",
+     "chengeng",
+     "helong",
+     "liubocheng",
+     "xuxiangqian",
+     "nierongzhen",
+     "fangzhimin",
+     "yangkaihui",
+     "zhaoyiman",
+     "jiangzhujun",
+     "wuyuzhang",
+     "xiangjingyu",
+     "kotoku",
+     "osugi",
+     "kobayashi",
+     "miyamoto",
+     "zhangwentian",
+     "wangming",
+     "maodun",
+     "kimjongil",
+     "choi",
+     "choibalsan"
+    ]
+   },
+   {
+    "t": "渐进赎买。",
+    "s": {
+     "deng": 1,
+     "chenyun": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 0,
+  "optional": true,
+  "q": "「天皇亲政」与「立宪内阁」之间，你倾向？",
+  "options": [
+   {
+    "t": "天皇亲政，大权在握。",
+    "s": {
+     "meiji": 2,
+     "taisho": 1,
+     "cixi": 1,
+     "bogd": 1
+    },
+    "exclude": [
+     "ito",
+     "okuma",
+     "inukai",
+     "kang",
+     "liang",
+     "ozaki",
+     "yoshino",
+     "hara",
+     "saionji",
+     "konoe",
+     "jangmyeon",
+     "tansitong",
+     "songjiaoren",
+     "nakae",
+     "taoxingzhi"
+    ]
+   },
+   {
+    "t": "立宪内阁，虚君实宪。",
+    "s": {
+     "ito": 2,
+     "okuma": 2,
+     "inukai": 1,
+     "kang": 1,
+     "liang": 1
+    },
+    "exclude": [
+     "meiji",
+     "taisho",
+     "cixi",
+     "bogd",
+     "xixiang",
+     "ronglu",
+     "nogi",
+     "mishima",
+     "araki",
+     "masaki"
+    ]
+   },
+   {
+    "t": "折中，天皇统而不治。",
+    "s": {
+     "saionji": 1,
+     "konoe": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 0,
+  "optional": true,
+  "q": "「社会民主主义」与「科学社会主义」，你认同哪种？",
+  "options": [
+   {
+    "t": "社会民主主义，议会道路。",
+    "s": {
+     "katayamatetsu": 2,
+     "dae": 2,
+     "okuma": 1,
+     "inukai": 1
+    },
+    "exclude": [
+     "kotoku",
+     "nosaka",
+     "katayama",
+     "tokuda",
+     "mao",
+     "chen",
+     "kim",
+     "dazhao",
+     "kawakami",
+     "guomoruo",
+     "wuyuzhang",
+     "dingling",
+     "xiangjingyu",
+     "osugi",
+     "kobayashi",
+     "miyamoto",
+     "zhangwentian",
+     "wangming",
+     "maodun",
+     "xiexuehong",
+     "liangshuming",
+     "dongbiwu",
+     "linboqu",
+     "zhude",
+     "linbiao",
+     "yangjingyu",
+     "yeting",
+     "suyu",
+     "chenyi",
+     "zuoquan",
+     "chengeng",
+     "helong",
+     "liubocheng",
+     "xuxiangqian",
+     "nierongzhen",
+     "fangzhimin",
+     "yangkaihui",
+     "zhaoyiman",
+     "jiangzhujun",
+     "kimjongil",
+     "choi",
+     "choibalsan"
+    ]
+   },
+   {
+    "t": "科学社会主义，革命道路。",
+    "s": {
+     "kotoku": 2,
+     "nosaka": 2,
+     "katayama": 1,
+     "tokuda": 1,
+     "mao": 1,
+     "chen": 1
+    },
+    "exclude": [
+     "katayamatetsu",
+     "dae",
+     "okuma",
+     "inukai",
+     "ozaki",
+     "hu",
+     "zhanglan",
+     "kimyoungsam",
+     "rohmoo",
+     "chosan",
+     "mikitakeo",
+     "shenjunru",
+     "zhangnaiqi",
+     "guoyuxin",
+     "chenwencheng",
+     "hara",
+     "yoshino",
+     "jangmyeon",
+     "caiyuanpei",
+     "chenyinque",
+     "linyutang",
+     "leizhen",
+     "yin",
+     "yanyangchu",
+     "qianzhongshu",
+     "linhuiyin",
+     "wuzhihui",
+     "shiba",
+     "tsuda",
+     "kikuchi",
+     "xuzhimo",
+     "fengzikai",
+     "fusinian",
+     "wangyunwu"
+    ]
+   },
+   {
+    "t": "改良与革命结合。",
+    "s": {
+     "deng": 1,
+     "zhou": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
+ },
+ {
+  "d": 1,
+  "optional": true,
+  "q": "「输出革命」与「和平共处」，你的取向？",
+  "options": [
+   {
+    "t": "输出革命，解放世界。",
+    "s": {
+     "mao": 2,
+     "kim": 2,
+     "dazhao": 1,
+     "nosaka": 1
+    },
+    "exclude": [
+     "zhou",
+     "deng",
+     "dae",
+     "yoshida",
+     "gu",
+          "song",
+     "dengyingchao",
+     "yejianying",
+     "chenyun",
+     "lixiannian",
+     "zhanglan",
+     "kimyoungsam",
+     "rohmoo",
+     "chosan",
+     "mikitakeo",
+     "katayamatetsu",
+     "shenjunru",
+     "zhangnaiqi",
+     "guoyuxin",
+     "chenwencheng",
+     "hatoyama",
+     "yonai",
+     "okada",
+     "saito",
+     "suzuki",
+     "inoue",
+     "mikasa",
+     "wutingfang",
+     "shidehara",
+     "shigemitsu",
+     "nitobe",
+     "kimgyusik",
+     "ashida",
+     "uchimura",
+     "bingxin",
+     "yosano",
+     "hiratsuka",
+     "tokuromi"
+    ]
+   },
+   {
+    "t": "和平共处，互不干涉内政。",
+    "s": {
+     "zhou": 2,
+     "deng": 2,
+     "dae": 1,
+     "yoshida": 1
+    },
+    "exclude": [
+     "mao",
+     "kim",
+     "dazhao",
+     "nosaka",
+     "katayama",
+     "kotoku",
+     "choibalsan",
+     "zhude",
+     "linbiao",
+     "yangjingyu",
+     "yeting",
+     "suyu",
+     "chenyi",
+     "zuoquan",
+     "chengeng",
+     "helong",
+     "liubocheng",
+     "xuxiangqian",
+     "nierongzhen",
+     "fangzhimin",
+     "yangkaihui",
+     "zhaoyiman",
+     "jiangzhujun",
+     "kimjongil",
+     "choi",
+     "liangshuming",
+     "kawakami",
+     "tokuda",
+     "dongbiwu",
+     "linboqu",
+     "guomoruo",
+     "wuyuzhang",
+     "dingling",
+     "xiangjingyu",
+     "osugi",
+     "kobayashi",
+     "miyamoto",
+     "zhangwentian",
+     "wangming",
+     "maodun",
+     "xiexuehong"
+    ]
+   },
+   {
+    "t": "有选择地支持正义一方。",
+    "s": {
+     "gu": 1,
+     "song": 1
+    }
+   },
+   {
+    "t": "无所谓。",
+    "s": {
+     "yuan": 1
+    }
+   }
+  ]
  }
 ];
 
@@ -15656,30 +16734,19 @@ let answers = [];
 let activeQuestions = [];
 
 function buildOptList() {
-  const wrap = document.getElementById('optWrap');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  questions.forEach((q, qi) => {
-    if (!q.optional) return;
-    const lab = document.createElement('label');
-    lab.className = 'opt-item';
-    lab.innerHTML = `<input type="checkbox" checked data-qi="${qi}"><span>${q.q}</span>`;
-    lab.querySelector('input').addEventListener('change', updateOptCount);
-    wrap.appendChild(lab);
-  });
   updateOptCount();
 }
 
 function updateOptCount() {
   const base = questions.filter(q => !q.optional).length;
-  const n = document.querySelectorAll('#optWrap input:checked').length;
-  document.getElementById('optCount').textContent = '已勾选 ' + n + ' 题';
-  document.getElementById('startBtn').textContent = '开始测试（' + (base + n) + ' 题）';
+  const opt = questions.filter(q => q.optional).length;
+  const use = document.getElementById('optToggle').checked;
+  document.getElementById('startBtn').textContent = '开始测试（' + (base + (use ? opt : 0)) + ' 题）';
 }
 
 function startQuiz() {
-  const checked = new Set([...document.querySelectorAll('#optWrap input:checked')].map(el => +el.dataset.qi));
-  activeQuestions = questions.filter((q, qi) => !q.optional || checked.has(qi));
+  const useOpt = document.getElementById('optToggle').checked;
+  activeQuestions = questions.filter(q => !q.optional || useOpt);
   document.getElementById('intro').classList.add('hidden');
   document.getElementById('quiz').classList.remove('hidden');
   current = 0; scores = {}; answers = [];
