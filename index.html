@@ -82,6 +82,17 @@
   .rank-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 999px; transition: width .6s ease; }
   .rank-item .pct { width: 44px; text-align: right; font-size: 13px; color: var(--muted); }
   .hidden { display: none !important; }
+
+  .avatar { position: relative; overflow: hidden; }
+  .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; display: none; }
+  .avatar .char-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 46px; font-weight: 700; }
+  .quote { text-align: center; margin-top: 20px; }
+  .quote-text { font-size: 18px; font-weight: 600; line-height: 1.6; color: var(--ink); }
+  .quote-text::before { content: "「"; color: var(--accent); }
+  .quote-text::after { content: "」"; color: var(--accent); }
+  .quote-src { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .intro { margin-top: 14px; text-align: left; background: #f4f6fb; border-left: 4px solid var(--accent2); border-radius: 10px; padding: 14px 16px; font-size: 14px; line-height: 1.7; color: #4a4e63; }
+  .intro b { color: var(--ink); }
   .fade-in { animation: fadeIn .4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
 </style>
@@ -112,12 +123,14 @@
     <div class="stage hidden" id="result">
       <div class="result-head fade-in">
         <div class="kicker">测试结果</div>
-        <div class="avatar" id="rAvatar"></div>
+        <div class="avatar" id="rAvatar"><span class="char-fallback" id="rChar"></span><img id="rImg" alt="" referrerpolicy="no-referrer"></div>
         <div>你与 <span class="match-pct" id="rPct"></span> 相似</div>
         <div class="result-name" id="rName"></div>
         <div class="result-title" id="rTitle"></div>
         <div><span class="region-label" id="rRegion"></span></div>
       </div>
+      <div class="quote fade-in"><div class="quote-text" id="rQuote"></div><div class="quote-src" id="rQuoteSrc"></div></div>
+      <div class="intro fade-in" id="rIntro"></div>
       <div class="desc fade-in" id="rDesc"></div>
       <div class="rank fade-in">
         <h3>完整排名（前 6 位）</h3>
@@ -131,56 +144,56 @@
 
 <script>
 const figures = {
-  lin:    { name:"林则徐",   char:"林", nation:"中国", title:"禁烟名臣", desc:"你刚正不阿、忧国忧民，敢于在列强环伺下挺身而出、捍卫国家尊严。你坚定而有骨气，宁可玉碎不为瓦全，是那种在民族危难时挺身担当的人。" },
-  zeng:   { name:"曾国藩",   char:"曾", nation:"中国", title:"湘军统帅·理学名臣", desc:"你沉稳坚韧、讲求实际，以「拙诚」立身，靠毅力与用人成就事业。你重视秩序与传统，深谋远虑、进退有度，是乱世中能成大事的实干家。" },
-  hong:   { name:"洪秀全",   char:"洪", nation:"中国", title:"太平天国天王", desc:"你满怀宗教式的理想与激情，敢于推翻旧秩序、建立心中的天国。你信念狂热、号召力强，但也易走向极端，是那种为理想不惜一切的变革者。" },
-  zuo:    { name:"左宗棠",   char:"左", nation:"中国", title:"收复新疆名臣", desc:"你刚烈强硬、胆识过人，认准的事就一往无前。你重视民族尊严与疆土完整，敢于与强敌针锋相对，是铁骨铮铮的实干派。" },
-  li:     { name:"李鸿章",   char:"李", nation:"中国", title:"洋务重臣", desc:"你精于实务与权谋，懂得在列强夹缝中周旋、以夷制夷。你务实而隐忍，背负骂名也顾全大局，是乱世中无奈的斡旋者。" },
-  cixi:   { name:"慈禧太后", char:"禧", nation:"中国", title:"晚清女主", desc:"你深谙权术、掌控欲强，善于在复杂的宫廷与朝局中维系自己的权力。你精明而多疑，把权力与稳定看得极重，是铁腕的秩序维护者。" },
-  zhang:  { name:"张之洞",   char:"张", nation:"中国", title:"中体西用名臣", desc:"你稳健务实，主张「中学为体、西学为用」，在守成与变革间寻找平衡。你重视教育与实业，是渐进改良、脚踏实地的建设者。" },
-  kang:   { name:"康有为",   char:"康", nation:"中国", title:"维新变法领袖", desc:"你理想宏大、热血激昂，渴望以一场自上而下的变法让国家迅速富强。你敢于上书言事、挑战旧制，是充满理想与使命感的改革者。" },
-  liang:  { name:"梁启超",   char:"梁", nation:"中国", title:"启蒙思想家", desc:"你才思敏捷、笔耕不辍，善于吸收新思想又不断反思调整。你相信启发民智、循序渐进，是温和而富有远见的启蒙者。" },
-  yuan:   { name:"袁世凯",   char:"袁", nation:"中国", title:"北洋领袖", desc:"你精于权谋、手腕高超，善于在乱局中审时度势、把握机会。你重实力与实效、野心勃勃，是现实主义与机会主义的化身。" },
-  sun:    { name:"孙中山",   char:"孙", nation:"中国", title:"革命先行者", desc:"你百折不挠、理想坚定，以「民族、民权、民生」为纲，毕生为推翻帝制、建立共和而奔走。你开放包容、矢志不渝，是纯粹的理想主义者。" },
-  chen:   { name:"陈独秀",   char:"陈", nation:"中国", title:"新文化运动旗手", desc:"你思想激进、锋芒毕露，敢于向旧传统开战、开辟新路。你激情四射、特立独行，是那种为理想与主义不惜牺牲的先行者。" },
-  luxun:  { name:"鲁迅",     char:"鲁", nation:"中国", title:"民族魂·文学巨匠", desc:"你冷峻犀利、独立思考，用笔作匕首解剖国民性。你愤世嫉俗又心怀大爱，宁折不弯、绝不同流合污，是清醒而孤独的批判者。" },
-  hu:     { name:"胡适",     char:"胡", nation:"中国", title:"自由主义知识分子", desc:"你理性温和、崇尚自由与渐进，主张「多研究些问题，少谈些主义」。你宽容、重实证、讲逻辑，是理性的改良主义者。" },
-  jiang:  { name:"蒋介石",   char:"蒋", nation:"中国", title:"国民革命军统帅", desc:"你意志坚定、顽强不屈，坚信唯有统一与强军才能救国。你重秩序、讲纪律、善用权谋，是乱世中强硬而坚韧的民族主义者。" },
-  mao:    { name:"毛泽东",   char:"毛", nation:"中国", title:"革命领袖", desc:"你理想热忱、意志如铁，怀有改天换地的雄心。你看重群众动员与斗争，敢于打破一切旧框架，越挫越勇、绝不屈服，是彻底的革命者。" },
-  zhou:   { name:"周恩来",   char:"周", nation:"中国", title:"人民的总理", desc:"你温文尔雅、精明干练，善于协调各方、化解矛盾。你务实而顾全大局，把个人荣辱置于事业之下，是深孚众望的调和者与实干家。" },
-  song:   { name:"宋庆龄",   char:"宋", nation:"中国", title:"国母·和平主义者", desc:"你温婉坚定、心怀大爱，毕生为和平、民主与妇女儿童事业奔走。你理想主义而立场鲜明，是道义与仁爱的化身。" },
-  deng:   { name:"邓小平",   char:"邓", nation:"中国", title:"改革开放总设计师", desc:"你务实灵活、深谋远虑，相信发展才是硬道理。你「摸着石头过河」，用渐进改革与制度设计化解难题，是稳中求进、能屈能伸的改革者。" },
-  zhangxueliang:{ name:"张学良", char:"良", nation:"中国", title:"少帅", desc:"你性情率真、重情重义，在历史关头以「西安事变」的兵谏扭转时局。你意气用事又心怀民族大义，是敢作敢当、亦正亦奇的性情中人。" },
-  gu:     { name:"顾维钧",   char:"顾", nation:"中国", title:"民国第一外交家", desc:"你温文尔雅、精通国际法，坚信外交与规则的力量。你在巴黎和会上据理力争，是把国家尊严寄于国际舞台的理性外交家。" },
-  jing:   { name:"蒋经国",   char:"经", nation:"台湾", title:"台湾建设者", desc:"你务实勤政、亲民低调，推动经济腾飞又在晚年开放党禁、开启民主。你循序渐进、重视民生，是稳健而开明的现代化推动者。" },
-  xixiang:{ name:"西乡隆盛", char:"西", nation:"日本", title:"最后的武士", desc:"你刚烈忠义、热血豪迈，坚守武士道精神，为理想不惜一死。你宁折不弯、坦荡磊落，是悲壮而纯粹的武士。" },
-  longma: { name:"坂本龙马", char:"坂", nation:"日本", title:"维新志士", desc:"你开朗豁达、眼光超前，善于在敌对势力间斡旋、促成联合。你胸襟开阔、不囿于门户，是理想与行动兼备的开路人。" },
-  fuze:   { name:"福泽谕吉", char:"福", nation:"日本", title:"启蒙之父", desc:"你理性独立、锐意进取，主张「脱亚入欧」、以科学与文明立国。你崇尚独立自尊与实学，是眼光远大的启蒙思想家。" },
-  ito:    { name:"伊藤博文", char:"伊", nation:"日本", title:"明治宪法之父", desc:"你务实而灵活，善于在传统与西方之间寻找平衡，主持立宪、推动维新。你精于政略、步步为营，是制度化的现代化推手。" },
-  yamagata:{ name:"山县有朋", char:"山", nation:"日本", title:"日本陆军之父", desc:"你冷静强硬、现实主义，坚信军事与秩序是国家的根基。你深谋远虑、手腕老辣，是典型的官僚与军国主义者。" },
-  okuma:  { name:"大隈重信", char:"隈", nation:"日本", title:"宪政先驱", desc:"你开明务实、热衷教育与民权，主张政党政治与宪政。你视野开阔、善用民意，是理性而进步的宪政主义者。" },
-  meiji:  { name:"明治天皇", char:"明", nation:"日本", title:"明治天皇", desc:"你象征着一个时代的变革，带领国家完成维新、走向富国强兵。你威严而进取，是集权与现代化的精神支柱。" },
-  togou:  { name:"东乡平八郎", char:"乡", nation:"日本", title:"海军元帅", desc:"你沉着果决、胆略过人，在海战中一击制胜。你冷静而勇猛，是那种关键时刻敢于先发制人的军人。" },
-  inukai: { name:"犬养毅",   char:"犬", nation:"日本", title:"政党政治领袖", desc:"你温厚而重情义，坚持政党政治与议会民主，反对军部专横。你理想而克制，是乱世中坚守宪政的温和派。" },
-  yoshida:{ name:"吉田茂",   char:"吉", nation:"日本", title:"战后首相", desc:"你务实冷静、亲美亲欧，坚信「轻军备、重经济」的立国之道。你理性而坚韧，是废墟上重建国家的现实主义政治家。" },
-  tojo:   { name:"东条英机", char:"条", nation:"日本", title:"二战首相", desc:"你强硬固执、狂热尚武，相信武力与扩张是国家的出路。你偏执而不妥协，是极端的军国主义者。" },
-  kishi:  { name:"岸信介",   char:"岸", nation:"日本", title:"保守派首相", desc:"你精明强干、保守务实，坚定亲美反共、推进日美安保。你手腕老练、重秩序，是典型的保守派官僚政治家。" },
-  ikeda:  { name:"池田勇人", char:"池", nation:"日本", title:"经济首相", desc:"你温和务实、专注经济，以「收入倍增」让国家走向繁荣。你理性而平和，是把发展当作头等大事的建设者。" },
-  kimku:  { name:"金九",     char:"九", nation:"韩国", title:"独立运动之父", desc:"你坚毅笃诚、矢志独立，主张联合各方、建立统一国家。你德高望重、顾全大局，是民族独立的道义象征。" },
-  an:     { name:"安重根",   char:"安", nation:"韩国", title:"民族义士", desc:"你热血刚烈、气节凛然，为民族大义甘愿舍身。你宁为玉碎、视死如归，是宁折不弯的民族英雄。" },
-  rhee:   { name:"李承晚",   char:"晚", nation:"韩国", title:"大韩民国首任总统", desc:"你强硬顽固、反共亲美，坚信唯有强权与意志才能立国。你固执己见、专断独行，是典型的威权民族主义者。" },
-  kim:    { name:"金日成",   char:"成", nation:"朝鲜", title:"开国领袖", desc:"你意志坚定、野心勃勃，以「主体思想」建立绝对权威。你崇尚革命与集权、反帝反殖，是彻底的威权革命者。" },
-  park:   { name:"朴正熙",   char:"朴", nation:"韩国", title:"汉江奇迹缔造者", desc:"你强硬务实、纪律严明，以铁腕推动工业化与经济增长。你重秩序、重结果，是威权发展主义的代表。" },
-  dae:    { name:"金大中",   char:"中", nation:"韩国", title:"民主斗士", desc:"你坚韧不拔、心怀和平，历经迫害仍坚持民主，用「阳光政策」化敌为友。你理想而不失务实，是宽容的民主领袖。" },
-  chun:   { name:"全斗焕",   char:"全", nation:"韩国", title:"威权统治者", desc:"你冷酷强硬、野心勃勃，以军事力量镇压异己、掌控政权。你重权力与秩序，是铁腕的威权统治者。" },
-  bogd:   { name:"博格多汗", char:"博", nation:"蒙古", title:"蒙古宗教领袖", desc:"你身兼宗教与世俗领袖，带领蒙古走向独立。你庄重而富有象征意义，是民族自决的精神象征。" },
-  sukh:   { name:"苏赫巴托尔", char:"苏", nation:"蒙古", title:"蒙古革命领袖", desc:"你勇敢坚毅、满怀理想，为蒙古的独立与革命献身。你热血忠诚，是年轻的革命先驱。" },
-  wei:    { name:"蒋渭水",   char:"渭", nation:"台湾", title:"台湾民主先驱", desc:"你热血激昂、关心社会，倡导启蒙与民众运动、反抗殖民统治。你理想而激进，是台湾近代社会运动的先声。" },
-  xian:   { name:"林献堂",   char:"献", nation:"台湾", title:"议会请愿运动领袖", desc:"你温文儒雅、理性克制，以议会请愿的方式争取台湾人的权利。你稳健而坚持，是非暴力抗争的温和派。" },
-  lee:    { name:"李登辉",   char:"登", nation:"台湾", title:"台湾民主化推动者", desc:"你务实灵活、善于审时度势，推动台湾走向民主与本土化。你深谙权术又勇于变革，是转型期的老练政治家。" },
-  dazhao: { name:"李大钊",   char:"钊", nation:"中国", title:"马克思主义先驱", desc:"你温厚博学、信念坚定，是共产主义在中国的先驱。你胸怀理想、视死如归，是「铁肩担道义」的理想主义者。" },
-  peng:   { name:"彭德怀",   char:"彭", nation:"中国", title:"横刀立马的元帅", desc:"你刚直不阿、敢说真话，战功赫赫却从不阿谀奉承。你实事求是、宁折不弯，是顶天立地的硬汉。" },
-  qiujin: { name:"秋瑾",     char:"秋", nation:"中国", title:"鉴湖女侠", desc:"你英姿飒爽、侠肝义胆，为革命与妇女解放不惜献身。你刚烈豪迈、视死如归，是巾帼不让须眉的革命志士。" },
+  lin: { name:"林则徐", char:"林", nation:"中国", title:"禁烟名臣", desc:"你刚正不阿、忧国忧民，敢于在列强环伺下挺身而出、捍卫国家尊严。你坚定而有骨气，宁可玉碎不为瓦全，是那种在民族危难时挺身担当的人。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Portrait_of_Lin_Zexu.jpeg/330px-Portrait_of_Lin_Zexu.jpeg", quote:"苟利国家生死以，岂因祸福避趋之", intro:"林则徐（1785—1850），清末政治家、民族英雄，虎门销烟的主持者，被誉为「开眼看世界的第一人」。" },
+  zeng: { name:"曾国藩", char:"曾", nation:"中国", title:"湘军统帅·理学名臣", desc:"你沉稳坚韧、讲求实际，以「拙诚」立身，靠毅力与用人成就事业。你重视秩序与传统，深谋远虑、进退有度，是乱世中能成大事的实干家。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Tseng_Kwo-Fan.tif/lossy-page1-330px-Tseng_Kwo-Fan.tif.jpg", quote:"莫问收获，但问耕耘", intro:"曾国藩（1811—1872），晚清名臣，湘军创立者与统帅，以平定太平天国和「拙诚」修身著称。" },
+  hong: { name:"洪秀全", char:"洪", nation:"中国", title:"太平天国天王", desc:"你满怀宗教式的理想与激情，敢于推翻旧秩序、建立心中的天国。你信念狂热、号召力强，但也易走向极端，是那种为理想不惜一切的变革者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Hong_Xiuquan.jpg/330px-Hong_Xiuquan.jpg", quote:"天下一家，共享太平", intro:"洪秀全（1814—1864），太平天国运动的发起者和「天王」，领导了近代规模最大的农民起义。" },
+  zuo: { name:"左宗棠", char:"左", nation:"中国", title:"收复新疆名臣", desc:"你刚烈强硬、胆识过人，认准的事就一往无前。你重视民族尊严与疆土完整，敢于与强敌针锋相对，是铁骨铮铮的实干派。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Zuo_Zongtang_1875.jpg/330px-Zuo_Zongtang_1875.jpg", quote:"身无半亩，心忧天下；读破万卷，神交古人", intro:"左宗棠（1812—1885），晚清名臣、军事家，率军收复新疆，也是洋务运动的重要推动者。" },
+  li: { name:"李鸿章", char:"李", nation:"中国", title:"洋务重臣", desc:"你精于实务与权谋，懂得在列强夹缝中周旋、以夷制夷。你务实而隐忍，背负骂名也顾全大局，是乱世中无奈的斡旋者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Li_Hung_Chang_in_1896.jpg/330px-Li_Hung_Chang_in_1896.jpg", quote:"一代人只能做一代人的事", intro:"李鸿章（1823—1901），晚清重臣，洋务运动核心人物，创办北洋海军，自嘲为「裱糊匠」。" },
+  cixi: { name:"慈禧太后", char:"禧", nation:"中国", title:"晚清女主", desc:"你深谙权术、掌控欲强，善于在复杂的宫廷与朝局中维系自己的权力。你精明而多疑，把权力与稳定看得极重，是铁腕的秩序维护者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/The_Ci-Xi_Imperial_Dowager_Empress_%289.2%29.PNG/330px-The_Ci-Xi_Imperial_Dowager_Empress_%289.2%29.PNG", quote:"量中华之物力，结与国之欢心", intro:"慈禧太后（1835—1908），晚清实际统治者，掌权近半个世纪，历经同光两朝与庚子之变。" },
+  zhang: { name:"张之洞", char:"张", nation:"中国", title:"中体西用名臣", desc:"你稳健务实，主张「中学为体、西学为用」，在守成与变革间寻找平衡。你重视教育与实业，是渐进改良、脚踏实地的建设者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/%E5%BC%B5%E4%B9%8B%E6%B4%9E%E6%9C%9D%E6%9C%8D%E7%85%A7.jpg/330px-%E5%BC%B5%E4%B9%8B%E6%B4%9E%E6%9C%9D%E6%9C%8D%E7%85%A7.jpg", quote:"中学为体，西学为用", intro:"张之洞（1837—1909），晚清名臣、洋务派代表，主张「中学为体、西学为用」，创办汉阳铁厂等。" },
+  kang: { name:"康有为", char:"康", nation:"中国", title:"维新变法领袖", desc:"你理想宏大、热血激昂，渴望以一场自上而下的变法让国家迅速富强。你敢于上书言事、挑战旧制，是充满理想与使命感的改革者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Kang_Yu-wei_cph.3a36142.jpg/330px-Kang_Yu-wei_cph.3a36142.jpg", quote:"能变则全，不变则亡；全变则强，小变仍亡", intro:"康有为（1858—1927），清末维新派领袖，发起「公车上书」、主导戊戌变法，主张君主立宪。" },
+  liang: { name:"梁启超", char:"梁", nation:"中国", title:"启蒙思想家", desc:"你才思敏捷、笔耕不辍，善于吸收新思想又不断反思调整。你相信启发民智、循序渐进，是温和而富有远见的启蒙者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/MinistroDeJusticiaLiangQichao.jpg/330px-MinistroDeJusticiaLiangQichao.jpg", quote:"少年强则国强", intro:"梁启超（1873—1929），近代启蒙思想家、史学家，戊戌变法领袖之一，著《少年中国说》等。" },
+  yuan: { name:"袁世凯", char:"袁", nation:"中国", title:"北洋领袖", desc:"你精于权谋、手腕高超，善于在乱局中审时度势、把握机会。你重实力与实效、野心勃勃，是现实主义与机会主义的化身。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/YuanShikaiPresidente1915.jpg/330px-YuanShikaiPresidente1915.jpg", quote:"乱世枭雄，审时度势，重实力而轻名分", intro:"袁世凯（1859—1916），北洋军阀领袖，清末练兵、民国总统，后复辟帝制失败。" },
+  sun: { name:"孙中山", char:"孙", nation:"中国", title:"革命先行者", desc:"你百折不挠、理想坚定，以「民族、民权、民生」为纲，毕生为推翻帝制、建立共和而奔走。你开放包容、矢志不渝，是纯粹的理想主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/%E5%AD%99%E4%B8%AD%E5%B1%B1%E8%82%96%E5%83%8F.jpg/330px-%E5%AD%99%E4%B8%AD%E5%B1%B1%E8%82%96%E5%83%8F.jpg", quote:"革命尚未成功，同志仍须努力", intro:"孙中山（1866—1925），中国民主革命先行者，创立同盟会、领导辛亥革命，提出三民主义。" },
+  chen: { name:"陈独秀", char:"陈", nation:"中国", title:"新文化运动旗手", desc:"你思想激进、锋芒毕露，敢于向旧传统开战、开辟新路。你激情四射、特立独行，是那种为理想与主义不惜牺牲的先行者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Chen_Duxiu4.jpg/330px-Chen_Duxiu4.jpg", quote:"德先生与赛先生——民主与科学", intro:"陈独秀（1879—1942），新文化运动领袖、中共主要创始人，高举「民主与科学」大旗。" },
+  luxun: { name:"鲁迅", char:"鲁", nation:"中国", title:"民族魂·文学巨匠", desc:"你冷峻犀利、独立思考，用笔作匕首解剖国民性。你愤世嫉俗又心怀大爱，宁折不弯、绝不同流合污，是清醒而孤独的批判者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/%E9%B2%81%E8%BF%85_1933%E5%B9%B45%E6%9C%8826%E6%97%A5%E6%91%84%E4%BA%8E%E4%B8%8A%E6%B5%B7.jpg/330px-%E9%B2%81%E8%BF%85_1933%E5%B9%B45%E6%9C%8826%E6%97%A5%E6%91%84%E4%BA%8E%E4%B8%8A%E6%B5%B7.jpg", quote:"横眉冷对千夫指，俯首甘为孺子牛", intro:"鲁迅（1881—1936），现代文学家、思想家，以犀利笔锋批判国民性，被誉为「民族魂」。" },
+  hu: { name:"胡适", char:"胡", nation:"中国", title:"自由主义知识分子", desc:"你理性温和、崇尚自由与渐进，主张「多研究些问题，少谈些主义」。你宽容、重实证、讲逻辑，是理性的改良主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Hu_Shih_1960_color.jpg/330px-Hu_Shih_1960_color.jpg", quote:"大胆的假设，小心的求证", intro:"胡适（1891—1962），现代学者、思想家，新文化运动旗手，倡导自由主义与实证精神。" },
+  jiang: { name:"蒋介石", char:"蒋", nation:"中国", title:"国民革命军统帅", desc:"你意志坚定、顽强不屈，坚信唯有统一与强军才能救国。你重秩序、讲纪律、善用权谋，是乱世中强硬而坚韧的民族主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/%E8%94%A3%E4%B8%AD%E6%AD%A3%E7%B8%BD%E7%B5%B1%E7%8E%89%E7%85%A7.png/330px-%E8%94%A3%E4%B8%AD%E6%AD%A3%E7%B8%BD%E7%B5%B1%E7%8E%89%E7%85%A7.png", quote:"精诚团结，共赴国难", intro:"蒋介石（1887—1975），国民党领导人、国民革命军统帅，领导抗战，后败退台湾。" },
+  mao: { name:"毛泽东", char:"毛", nation:"中国", title:"革命领袖", desc:"你理想热忱、意志如铁，怀有改天换地的雄心。你看重群众动员与斗争，敢于打破一切旧框架，越挫越勇、绝不屈服，是彻底的革命者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Mao_Zedong_1950_Portrait_%283x4_cropped%29.jpg/330px-Mao_Zedong_1950_Portrait_%283x4_cropped%29.jpg", quote:"星星之火，可以燎原", intro:"毛泽东（1893—1976），中国革命家、理论家、诗人，新中国的缔造者与主要领导人。" },
+  zhou: { name:"周恩来", char:"周", nation:"中国", title:"人民的总理", desc:"你温文尔雅、精明干练，善于协调各方、化解矛盾。你务实而顾全大局，把个人荣辱置于事业之下，是深孚众望的调和者与实干家。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Zhou_Enlai_1972.jpg/330px-Zhou_Enlai_1972.jpg", quote:"为中华之崛起而读书", intro:"周恩来（1898—1976），新中国首任总理、杰出外交家，以务实稳健、鞠躬尽瘁著称。" },
+  song: { name:"宋庆龄", char:"宋", nation:"中国", title:"国母·和平主义者", desc:"你温婉坚定、心怀大爱，毕生为和平、民主与妇女儿童事业奔走。你理想主义而立场鲜明，是道义与仁爱的化身。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Soong_Ching-ling.jpg/330px-Soong_Ching-ling.jpg", quote:"和平、奋斗、救中国", intro:"宋庆龄（1893—1981），孙中山夫人，著名的爱国主义、民主主义与国际和平活动家。" },
+  deng: { name:"邓小平", char:"邓", nation:"中国", title:"改革开放总设计师", desc:"你务实灵活、深谋远虑，相信发展才是硬道理。你「摸着石头过河」，用渐进改革与制度设计化解难题，是稳中求进、能屈能伸的改革者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Deng_Xiaoping_at_the_arrival_ceremony_for_the_Vice_Premier_of_China_%28cropped%29.jpg/330px-Deng_Xiaoping_at_the_arrival_ceremony_for_the_Vice_Premier_of_China_%28cropped%29.jpg", quote:"发展才是硬道理", intro:"邓小平（1904—1997），中国改革开放总设计师，开创中国特色社会主义道路。" },
+  zhangxueliang: { name:"张学良", char:"良", nation:"中国", title:"少帅", desc:"你性情率真、重情重义，在历史关头以「西安事变」的兵谏扭转时局。你意气用事又心怀民族大义，是敢作敢当、亦正亦奇的性情中人。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Chang_Shueliang.jpg/330px-Chang_Shueliang.jpg", quote:"愿为国家民族牺牲一切，亦忠亦义亦性情", intro:"张学良（1901—2001），东北军统帅，发动西安事变，促成抗日民族统一战线。" },
+  gu: { name:"顾维钧", char:"顾", nation:"中国", title:"民国第一外交家", desc:"你温文尔雅、精通国际法，坚信外交与规则的力量。你在巴黎和会上据理力争，是把国家尊严寄于国际舞台的理性外交家。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Wellington_Koo_1945.jpg/330px-Wellington_Koo_1945.jpg", quote:"弱国无外交，唯有自强以立世界", intro:"顾维钧（1888—1985），近代著名外交家，曾在巴黎和会与联合国等场合维护国家权益。" },
+  jing: { name:"蒋经国", char:"经", nation:"台湾", title:"台湾建设者", desc:"你务实勤政、亲民低调，推动经济腾飞又在晚年开放党禁、开启民主。你循序渐进、重视民生，是稳健而开明的现代化推动者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/%E8%94%A3%E7%B6%93%E5%9C%8B%E7%B8%BD%E7%B5%B1_1.jpg/330px-%E8%94%A3%E7%B6%93%E5%9C%8B%E7%B8%BD%E7%B5%B1_1.jpg", quote:"时代在变，潮流在变，观念也要跟着变", intro:"蒋经国（1910—1988），台湾地区领导人，推动经济起飞，晚年开放党禁、开启民主化。" },
+  xixiang: { name:"西乡隆盛", char:"西", nation:"日本", title:"最后的武士", desc:"你刚烈忠义、热血豪迈，坚守武士道精神，为理想不惜一死。你宁折不弯、坦荡磊落，是悲壮而纯粹的武士。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Saigo_Takamori.jpg/330px-Saigo_Takamori.jpg", quote:"敬天爱人", intro:"西乡隆盛（1828—1877），日本明治维新功臣、「最后的武士」，后发动西南战争兵败自尽。" },
+  longma: { name:"坂本龙马", char:"坂", nation:"日本", title:"维新志士", desc:"你开朗豁达、眼光超前，善于在敌对势力间斡旋、促成联合。你胸襟开阔、不囿于门户，是理想与行动兼备的开路人。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Sakamoto_Ryoma.jpg/330px-Sakamoto_Ryoma.jpg", quote:"洞察天下大势，促成萨长同盟", intro:"坂本龙马（1836—1867），日本幕末志士，促成萨长同盟、提出「船中八策」，是维新先驱。" },
+  fuze: { name:"福泽谕吉", char:"福", nation:"日本", title:"启蒙之父", desc:"你理性独立、锐意进取，主张「脱亚入欧」、以科学与文明立国。你崇尚独立自尊与实学，是眼光远大的启蒙思想家。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Fukuzawa_Yukichi_1891.jpg/330px-Fukuzawa_Yukichi_1891.jpg", quote:"天不生人上之人，也不生人下之人", intro:"福泽谕吉（1835—1901），日本启蒙思想家、教育家，主张「脱亚入欧」，创办庆应义塾。" },
+  ito: { name:"伊藤博文", char:"伊", nation:"日本", title:"明治宪法之父", desc:"你务实而灵活，善于在传统与西方之间寻找平衡，主持立宪、推动维新。你精于政略、步步为营，是制度化的现代化推手。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/IT%C5%8C_Hirobumi.jpg/330px-IT%C5%8C_Hirobumi.jpg", quote:"醉卧美人膝，醒握天下权", intro:"伊藤博文（1841—1909），日本首任内阁总理大臣，主持制定明治宪法，推动立宪与维新。" },
+  yamagata: { name:"山县有朋", char:"山", nation:"日本", title:"日本陆军之父", desc:"你冷静强硬、现实主义，坚信军事与秩序是国家的根基。你深谋远虑、手腕老辣，是典型的官僚与军国主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Yamagata_Aritomo.jpg/330px-Yamagata_Aritomo.jpg", quote:"主权线、利益线，乃国家之根本", intro:"山县有朋（1838—1922），日本陆军元老、首相，奠定日本军国主义与官僚体制。" },
+  okuma: { name:"大隈重信", char:"隈", nation:"日本", title:"宪政先驱", desc:"你开明务实、热衷教育与民权，主张政党政治与宪政。你视野开阔、善用民意，是理性而进步的宪政主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/OKUMA_Shigenobu.jpg/330px-OKUMA_Shigenobu.jpg", quote:"宪政与教育，是国家进步之基", intro:"大隈重信（1838—1922），日本政治家、首相，创办早稻田大学，主张政党政治与宪政。" },
+  meiji: { name:"明治天皇", char:"明", nation:"日本", title:"明治天皇", desc:"你象征着一个时代的变革，带领国家完成维新、走向富国强兵。你威严而进取，是集权与现代化的精神支柱。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Meiji_Emperor.jpg/330px-Meiji_Emperor.jpg", quote:"广兴会议，万机决于公论", intro:"明治天皇（1852—1912），日本第122代天皇，明治维新的象征，带领日本走向近代化。" },
+  togou: { name:"东乡平八郎", char:"乡", nation:"日本", title:"海军元帅", desc:"你沉着果决、胆略过人，在海战中一击制胜。你冷静而勇猛，是那种关键时刻敢于先发制人的军人。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Togo_Heihachiro%2C1907.jpg/330px-Togo_Heihachiro%2C1907.jpg", quote:"皇国兴废，在此一战", intro:"东乡平八郎（1848—1934），日本海军元帅，以对马海战中全歼俄国舰队而闻名。" },
+  inukai: { name:"犬养毅", char:"犬", nation:"日本", title:"政党政治领袖", desc:"你温厚而重情义，坚持政党政治与议会民主，反对军部专横。你理想而克制，是乱世中坚守宪政的温和派。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Tsuyoshi_Inukai_cropped.jpg/330px-Tsuyoshi_Inukai_cropped.jpg", quote:"以议会救国，以宪政卫民", intro:"犬养毅（1855—1932），日本首相、政党政治家，坚持议会民主，被军部刺杀。" },
+  yoshida: { name:"吉田茂", char:"吉", nation:"日本", title:"战后首相", desc:"你务实冷静、亲美亲欧，坚信「轻军备、重经济」的立国之道。你理性而坚韧，是废墟上重建国家的现实主义政治家。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Shigeru_Yoshida_suit.jpg/330px-Shigeru_Yoshida_suit.jpg", quote:"败而不馁，卧薪尝胆重建家园", intro:"吉田茂（1878—1967），日本战后首相，确立「轻军备、重经济」路线，主导战后重建。" },
+  tojo: { name:"东条英机", char:"条", nation:"日本", title:"二战首相", desc:"你强硬固执、狂热尚武，相信武力与扩张是国家的出路。你偏执而不妥协，是极端的军国主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Hideki_Tojo_2.jpg/330px-Hideki_Tojo_2.jpg", quote:"以武力扩张国运，一意孤行", intro:"东条英机（1884—1948），日本首相、陆军大将，发动太平洋战争的军国主义代表人物。" },
+  kishi: { name:"岸信介", char:"岸", nation:"日本", title:"保守派首相", desc:"你精明强干、保守务实，坚定亲美反共、推进日美安保。你手腕老练、重秩序，是典型的保守派官僚政治家。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Nobusuke_Kishi_portrait.jpg/330px-Nobusuke_Kishi_portrait.jpg", quote:"亲美反共，以安保条约立国", intro:"岸信介（1896—1987），日本首相，推动修订《日美安保条约》，战后保守政治的代表。" },
+  ikeda: { name:"池田勇人", char:"池", nation:"日本", title:"经济首相", desc:"你温和务实、专注经济，以「收入倍增」让国家走向繁荣。你理性而平和，是把发展当作头等大事的建设者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Hayato_Ikeda_1962_%28cropped%29.jpg/330px-Hayato_Ikeda_1962_%28cropped%29.jpg", quote:"让国民收入倍增，让百姓过上好日子", intro:"池田勇人（1899—1965），日本首相，推行「国民收入倍增计划」，实现经济高速增长。" },
+  kimku: { name:"金九", char:"九", nation:"韩国", title:"独立运动之父", desc:"你坚毅笃诚、矢志独立，主张联合各方、建立统一国家。你德高望重、顾全大局，是民族独立的道义象征。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Kim_Gu_in_1949.jpg/330px-Kim_Gu_in_1949.jpg", quote:"我唯一的愿望，是祖国的完全独立", intro:"金九（1876—1949），韩国独立运动领袖，大韩民国临时政府领导人，后遭暗杀。" },
+  an: { name:"安重根", char:"安", nation:"韩国", title:"民族义士", desc:"你热血刚烈、气节凛然，为民族大义甘愿舍身。你宁为玉碎、视死如归，是宁折不弯的民族英雄。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/An_Jung-geun.JPG/330px-An_Jung-geun.JPG", quote:"以一死报国，求民族独立", intro:"安重根（1879—1910），韩国独立运动家，刺杀伊藤博文，被处死，是韩民族英雄。" },
+  rhee: { name:"李承晚", char:"晚", nation:"韩国", title:"大韩民国首任总统", desc:"你强硬顽固、反共亲美，坚信唯有强权与意志才能立国。你固执己见、专断独行，是典型的威权民族主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Rhee_Syng-Man_in_1948.jpg/330px-Rhee_Syng-Man_in_1948.jpg", quote:"先统一，后建设", intro:"李承晚（1875—1965），大韩民国首任总统，坚定反共亲美，长期执政后流亡海外。" },
+  kim: { name:"金日成", char:"成", nation:"朝鲜", title:"开国领袖", desc:"你意志坚定、野心勃勃，以「主体思想」建立绝对权威。你崇尚革命与集权、反帝反殖，是彻底的威权革命者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Kim_Il_Sung_Portrait-3.jpg/330px-Kim_Il_Sung_Portrait-3.jpg", quote:"人是自己命运的主人", intro:"金日成（1912—1994），朝鲜民主主义人民共和国缔造者与最高领导人，创立「主体思想」。" },
+  park: { name:"朴正熙", char:"朴", nation:"韩国", title:"汉江奇迹缔造者", desc:"你强硬务实、纪律严明，以铁腕推动工业化与经济增长。你重秩序、重结果，是威权发展主义的代表。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Park_Chung_Hee_%28%EB%B0%95%EC%A0%95%ED%9D%AC%29_Presidential_Portrait.jpg/330px-Park_Chung_Hee_%28%EB%B0%95%EC%A0%95%ED%9D%AC%29_Presidential_Portrait.jpg", quote:"我们也要过上好日子——自助者天助", intro:"朴正熙（1917—1979），韩国总统，以铁腕推动工业化，缔造「汉江奇迹」，遇刺身亡。" },
+  dae: { name:"金大中", char:"中", nation:"韩国", title:"民主斗士", desc:"你坚韧不拔、心怀和平，历经迫害仍坚持民主，用「阳光政策」化敌为友。你理想而不失务实，是宽容的民主领袖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Kim_Dae-jung_presidential_portrait.jpg/330px-Kim_Dae-jung_presidential_portrait.jpg", quote:"行动要像巨人，思想要像深海", intro:"金大中（1924—2009），韩国总统、民主斗士，推动「阳光政策」，获诺贝尔和平奖。" },
+  chun: { name:"全斗焕", char:"全", nation:"韩国", title:"威权统治者", desc:"你冷酷强硬、野心勃勃，以军事力量镇压异己、掌控政权。你重权力与秩序，是铁腕的威权统治者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Chun_Doo-hwan_%28%EC%A0%84%EB%91%90%ED%99%98%29_Presidential_Portrait.jpg/330px-Chun_Doo-hwan_%28%EC%A0%84%EB%91%90%ED%99%98%29_Presidential_Portrait.jpg", quote:"以强力维持秩序，以铁腕推进统治", intro:"全斗焕（1931—2021），韩国总统，通过军事政变上台，以铁腕镇压民主运动。" },
+  bogd: { name:"博格多汗", char:"博", nation:"蒙古", title:"蒙古宗教领袖", desc:"你身兼宗教与世俗领袖，带领蒙古走向独立。你庄重而富有象征意义，是民族自决的精神象征。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Sharav_bogd_khan.jpg/330px-Sharav_bogd_khan.jpg", quote:"蒙古归于蒙古人，重建民族的独立", intro:"博格多汗（1869—1924），第八世哲布尊丹巴，蒙古独立后被拥立为蒙古大汗。" },
+  sukh: { name:"苏赫巴托尔", char:"苏", nation:"蒙古", title:"蒙古革命领袖", desc:"你勇敢坚毅、满怀理想，为蒙古的独立与革命献身。你热血忠诚，是年轻的革命先驱。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Sukhbaatar.jpg/330px-Sukhbaatar.jpg", quote:"为蒙古人民的自由与独立而战", intro:"苏赫巴托尔（1893—1923），蒙古人民革命党创始人，蒙古人民共和国的奠基者。" },
+  wei: { name:"蒋渭水", char:"渭", nation:"台湾", title:"台湾民主先驱", desc:"你热血激昂、关心社会，倡导启蒙与民众运动、反抗殖民统治。你理想而激进，是台湾近代社会运动的先声。", img:"https://upload.wikimedia.org/wikipedia/commons/9/9a/Chiang_Wei-shui.jpg", quote:"同胞须团结，团结真有力", intro:"蒋渭水（1891—1931），台湾抗日与民主运动先驱，创办台湾文化协会。" },
+  xian: { name:"林献堂", char:"献", nation:"台湾", title:"议会请愿运动领袖", desc:"你温文儒雅、理性克制，以议会请愿的方式争取台湾人的权利。你稳健而坚持，是非暴力抗争的温和派。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/%E8%87%BA%E7%81%A3%E6%96%87%E5%8C%96%E8%88%87%E6%B0%91%E4%B8%BB%E9%81%8B%E5%8B%95%E9%A0%98%E8%A2%96%E6%9E%97%E7%8D%BB%E5%A0%82_Lin_Hsien-tang%2C_Leader_of_Taiwanese_Culture_and_Democracy_Movement.jpg/330px-%E8%87%BA%E7%81%A3%E6%96%87%E5%8C%96%E8%88%87%E6%B0%91%E4%B8%BB%E9%81%8B%E5%8B%95%E9%A0%98%E8%A2%96%E6%9E%97%E7%8D%BB%E5%A0%82_Lin_Hsien-tang%2C_Leader_of_Taiwanese_Culture_and_Democracy_Movement.jpg", quote:"以和平合法的方式争取自治与权利", intro:"林献堂（1881—1956），台湾议会请愿运动领袖，以和平合法方式争取台湾人权利。" },
+  lee: { name:"李登辉", char:"登", nation:"台湾", title:"台湾民主化推动者", desc:"你务实灵活、善于审时度势，推动台湾走向民主与本土化。你深谙权术又勇于变革，是转型期的老练政治家。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/%E6%9D%8E%E7%B8%BD%E7%B5%B1%E7%99%BB%E8%BC%9D%E5%85%88%E7%94%9F%E7%8E%89%E7%85%A7_%28cropped%29.jpg/330px-%E6%9D%8E%E7%B8%BD%E7%B5%B1%E7%99%BB%E8%BC%9D%E5%85%88%E7%94%9F%E7%8E%89%E7%85%A7_%28cropped%29.jpg", quote:"生为台湾人的悲哀，也要走出台湾人的尊严", intro:"李登辉（1923—2020），台湾地区领导人，推动台湾民主化与本土化进程。" },
+  dazhao: { name:"李大钊", char:"钊", nation:"中国", title:"马克思主义先驱", desc:"你温厚博学、信念坚定，是共产主义在中国的先驱。你胸怀理想、视死如归，是「铁肩担道义」的理想主义者。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/1930_Li_Dazhao_Chinese_comintern.jpg/330px-1930_Li_Dazhao_Chinese_comintern.jpg", quote:"试看将来的环球，必是赤旗的世界", intro:"李大钊（1889—1927），中国最早的马克思主义者、中共主要创始人之一，被军阀杀害。" },
+  peng: { name:"彭德怀", char:"彭", nation:"中国", title:"横刀立马的元帅", desc:"你刚直不阿、敢说真话，战功赫赫却从不阿谀奉承。你实事求是、宁折不弯，是顶天立地的硬汉。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/General_Peng_Dehuai.jpg/330px-General_Peng_Dehuai.jpg", quote:"谁敢横刀立马，唯我彭大将军", intro:"彭德怀（1898—1974），中国人民解放军元帅，抗美援朝指挥者，以刚直敢言著称。" },
+  qiujin: { name:"秋瑾", char:"秋", nation:"中国", title:"鉴湖女侠", desc:"你英姿飒爽、侠肝义胆，为革命与妇女解放不惜献身。你刚烈豪迈、视死如归，是巾帼不让须眉的革命志士。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Qiu_jin.jpg/330px-Qiu_jin.jpg", quote:"身不得男儿列，心却比男儿烈", intro:"秋瑾（1875—1907），近代民主革命家、女权先驱，参加反清起义失败就义，号「鉴湖女侠」。" },
 };
 
 const DIMS = ["经济政治倾向","国际法态度","行事方式","性格"];
@@ -212,11 +225,11 @@ const questions = [
     { t:"大政府，全面保障民生。", s:{ song:2, dae:2, liang:1 } },
     { t:"有限但有为，该管的管、该放的放。", s:{ deng:2, jing:2, zhou:1 } },
   ]},
-  { d:0, q:"「自由」与「平等」之间，你更看重？", options:[
+  { d:0, q:"「自由」「平等」「秩序」之间，你更看重？", options:[
     { t:"自由优先。", s:{ hu:2, okuma:2, fuze:2, lee:2 } },
     { t:"平等优先。", s:{ mao:2, chen:2, dazhao:2, kim:1 } },
     { t:"秩序与稳定优先。", s:{ zeng:2, cixi:2, chun:2, park:1 } },
-    { t:"两者平衡、相互成就。", s:{ sun:2, zhou:2, dae:2 } },
+    { t:"三者兼顾、相互成就。", s:{ sun:2, zhou:2, dae:2 } },
   ]},
   { d:0, q:"对待传统文化，你的态度？", options:[
     { t:"彻底反传统、破旧立新。", s:{ chen:2, luxun:2, mao:2 } },
@@ -307,7 +320,7 @@ const questions = [
   { d:1, q:"对殖民地与被压迫民族，你的立场？", options:[
     { t:"支持民族独立解放。", s:{ sun:2, kimku:2, an:2, sukh:2 } },
     { t:"反帝反殖、输出革命。", s:{ mao:2, kim:2, dazhao:1 } },
-    { t:"痛恨列强、奋发图强。", s:{ lin:2, zuo:2, qiujin:2 } },
+    { t:"同情弱小、痛恨列强。", s:{ lin:2, zuo:2, qiujin:2 } },
     { t:"承认现实、忍辱图强。", s:{ li:2, ito:1, zeng:1 } },
   ]},
   { d:1, q:"关于领土与主权，你会？", options:[
@@ -356,7 +369,7 @@ const questions = [
     { t:"自力更生、拒绝依赖。", s:{ mao:2, kim:2, sukh:2 } },
     { t:"利用外资发展自己。", s:{ deng:2, jing:2, ikeda:2 } },
     { t:"接受援助、亲美合作。", s:{ rhee:2, kishi:2, jiang:2 } },
-    { t:"对外援助、输出革命。", s:{ mao:1, kim:1 } },
+    { t:"谨慎接受、防止受制于人。", s:{ zuo:2, li:1, ito:2 } },
   ]},
   { d:1, q:"对民族独立运动，你的立场？", options:[
     { t:"武装抗争、血荐轩辕。", s:{ kimku:2, an:2, sun:2, sukh:2 } },
@@ -501,7 +514,7 @@ const questions = [
     { t:"谦逊内敛，不居功。", s:{ gu:2, zeng:2, ikeda:2 } },
     { t:"信念坚定，毫不动摇。", s:{ qiujin:2, an:2, dazhao:2, kimku:1 } },
   ]},
-  { d:3, q:"你的情绪控制方式？", options:[
+  { d:3, q:"你的情绪风格更接近？", options:[
     { t:"深藏不露，不动声色。", s:{ cixi:2, yuan:2, kishi:2, li:1 } },
     { t:"激情外露，快意恩仇。", s:{ qiujin:2, hong:2, luxun:2 } },
     { t:"沉着冷静，处变不惊。", s:{ zeng:2, gu:2, ikeda:2 } },
@@ -625,9 +638,18 @@ function showResult() {
   document.getElementById('quiz').classList.add('hidden');
   document.getElementById('result').classList.remove('hidden');
   document.getElementById('progressBar').style.width = '100%';
-  document.getElementById('rAvatar').textContent = f.char;
+  document.getElementById('rChar').textContent = f.char;
+  const imgEl = document.getElementById('rImg');
+  if (f.img) {
+    imgEl.src = f.img;
+    imgEl.onload = () => { imgEl.style.display = 'block'; };
+    imgEl.onerror = () => { imgEl.style.display = 'none'; };
+  }
   document.getElementById('rName').textContent = f.name;
   document.getElementById('rTitle').textContent = f.title;
+  document.getElementById('rQuote').textContent = f.quote;
+  document.getElementById('rQuoteSrc').textContent = '—— ' + f.name;
+  document.getElementById('rIntro').textContent = f.intro;
   document.getElementById('rDesc').textContent = f.desc;
   document.getElementById('rPct').textContent = '100%';
   document.getElementById('rRegion').textContent = f.nation + ' · ' + f.title;
