@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你像哪位东亚历史人物？</title>
+<style>
+  :root {
+    --bg1: #1a1c2c;
+    --bg2: #2b2e4a;
+    --card: #ffffff;
+    --ink: #2a2d3e;
+    --muted: #8a8fa3;
+    --accent: #c9a227;
+    --accent2: #7c5cd6;
+    --bar-bg: #eef0f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px; color: var(--ink);
+  }
+  .app {
+    width: 100%; max-width: 680px; background: var(--card);
+    border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,.35); overflow: hidden;
+  }
+  .stage { padding: 36px 36px 30px; }
+  .progress-wrap { height: 6px; background: var(--bar-bg); }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); width: 0%; transition: width .35s ease; }
+  .kicker { font-size: 12px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+  h1 { font-size: 26px; line-height: 1.35; margin-bottom: 12px; }
+  .sub { color: var(--muted); font-size: 15px; line-height: 1.7; }
+  .tag { display: inline-block; background: #f4efe0; color: #a8841a; border-radius: 999px; padding: 4px 12px; font-size: 12px; margin: 2px 4px 2px 0; }
+
+  .q-num { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-tag { float: right; font-size: 12px; color: #fff; background: var(--accent2); border-radius: 999px; padding: 2px 10px; }
+  .question { font-size: 19px; font-weight: 700; line-height: 1.5; margin-bottom: 24px; }
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .option {
+    display: flex; align-items: center; gap: 14px; border: 2px solid var(--bar-bg);
+    border-radius: 14px; padding: 15px 18px; cursor: pointer; transition: all .18s ease;
+    background: #fff; text-align: left; font-size: 15px; line-height: 1.5;
+  }
+  .option:hover { border-color: var(--accent2); transform: translateY(-1px); }
+  .option .letter {
+    flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--bar-bg);
+    color: var(--muted); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; transition: all .18s ease;
+  }
+  .option:hover .letter, .option.selected .letter { background: var(--accent2); color: #fff; }
+  .option.selected { border-color: var(--accent2); }
+  .btn {
+    width: 100%; padding: 15px; border: none; border-radius: 14px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent)); color: #fff;
+    font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 1px; transition: opacity .18s ease;
+  }
+  .btn:hover { opacity: .9; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .footer-nav { margin-top: 20px; display: flex; gap: 12px; }
+  .ghost { flex: 1; padding: 13px; border: 2px solid var(--bar-bg); border-radius: 14px; background: #fff; color: var(--muted); font-size: 14px; cursor: pointer; }
+  .ghost:hover { border-color: var(--accent2); color: var(--ink); }
+
+  .result-head { text-align: center; }
+  .avatar {
+    width: 110px; height: 110px; border-radius: 50%; background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff; font-size: 46px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; box-shadow: 0 12px 30px rgba(124,92,214,.35);
+  }
+  .match-pct { color: var(--accent); font-weight: 800; font-size: 22px; }
+  .result-name { font-size: 30px; font-weight: 800; margin: 6px 0; }
+  .result-title { color: var(--muted); font-size: 15px; }
+  .region-label { display: inline-block; background: #f4efe0; color: #a8841a; border-radius: 999px; padding: 3px 12px; font-size: 12px; margin-top: 10px; }
+  .desc { margin-top: 18px; text-align: left; background: #faf9f5; border-radius: 14px; padding: 18px 20px; font-size: 15px; line-height: 1.8; }
+  .rank { margin-top: 22px; text-align: left; }
+  .rank h3 { font-size: 14px; color: var(--muted); margin-bottom: 12px; letter-spacing: 1px; }
+  .rank-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .rank-item .name { width: 96px; font-weight: 700; font-size: 14px; }
+  .rank-bar { flex: 1; height: 14px; background: var(--bar-bg); border-radius: 999px; overflow: hidden; }
+  .rank-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 999px; transition: width .6s ease; }
+  .rank-item .pct { width: 44px; text-align: right; font-size: 13px; color: var(--muted); }
+  .hidden { display: none !important; }
+  .fade-in { animation: fadeIn .4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+    <div class="stage" id="intro">
+      <div class="kicker">历史人格测试</div>
+      <h1>你像哪位东亚历史人物？</h1>
+      <p class="sub">收录 <b>1800 年以后</b>的 <b>50 位东亚历史人物</b>（中国 · 日本 · 韩国 · 朝鲜 · 蒙古 · 台湾），从<span class="tag">经济政治倾向</span><span class="tag">国际法态度</span><span class="tag">行事方式</span><span class="tag">性格</span>四个维度、共 <b>60 道题</b>，测出与你最相似的那一位。</p>
+      <div style="margin-top:28px">
+        <button class="btn" onclick="startQuiz()">开始测试（60 题）</button>
+      </div>
+    </div>
+
+    <div class="stage hidden" id="quiz">
+      <div class="q-num"><span id="qNumText"></span><span class="dim-tag" id="dimTag"></span></div>
+      <div class="question" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+      <div class="footer-nav">
+        <button class="ghost hidden" id="prevBtn" onclick="prevQuestion()">上一题</button>
+        <button class="ghost" id="nextBtn" onclick="nextQuestion()" disabled>下一题</button>
+      </div>
+    </div>
+
+    <div class="stage hidden" id="result">
+      <div class="result-head fade-in">
+        <div class="kicker">测试结果</div>
+        <div class="avatar" id="rAvatar"></div>
+        <div>你与 <span class="match-pct" id="rPct"></span> 相似</div>
+        <div class="result-name" id="rName"></div>
+        <div class="result-title" id="rTitle"></div>
+        <div><span class="region-label" id="rRegion"></span></div>
+      </div>
+      <div class="desc fade-in" id="rDesc"></div>
+      <div class="rank fade-in">
+        <h3>完整排名（前 6 位）</h3>
+        <div id="rRank"></div>
+      </div>
+      <div style="margin-top:26px; display:flex; gap:12px">
+        <button class="btn" onclick="restart()">重新测试</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const figures = {
+  lin:    { name:"林则徐",   char:"林", nation:"中国", title:"禁烟名臣", desc:"你刚正不阿、忧国忧民，敢于在列强环伺下挺身而出、捍卫国家尊严。你坚定而有骨气，宁可玉碎不为瓦全，是那种在民族危难时挺身担当的人。" },
+  zeng:   { name:"曾国藩",   char:"曾", nation:"中国", title:"湘军统帅·理学名臣", desc:"你沉稳坚韧、讲求实际，以「拙诚」立身，靠毅力与用人成就事业。你重视秩序与传统，深谋远虑、进退有度，是乱世中能成大事的实干家。" },
+  hong:   { name:"洪秀全",   char:"洪", nation:"中国", title:"太平天国天王", desc:"你满怀宗教式的理想与激情，敢于推翻旧秩序、建立心中的天国。你信念狂热、号召力强，但也易走向极端，是那种为理想不惜一切的变革者。" },
+  zuo:    { name:"左宗棠",   char:"左", nation:"中国", title:"收复新疆名臣", desc:"你刚烈强硬、胆识过人，认准的事就一往无前。你重视民族尊严与疆土完整，敢于与强敌针锋相对，是铁骨铮铮的实干派。" },
+  li:     { name:"李鸿章",   char:"李", nation:"中国", title:"洋务重臣", desc:"你精于实务与权谋，懂得在列强夹缝中周旋、以夷制夷。你务实而隐忍，背负骂名也顾全大局，是乱世中无奈的斡旋者。" },
+  cixi:   { name:"慈禧太后", char:"禧", nation:"中国", title:"晚清女主", desc:"你深谙权术、掌控欲强，善于在复杂的宫廷与朝局中维系自己的权力。你精明而多疑，把权力与稳定看得极重，是铁腕的秩序维护者。" },
+  zhang:  { name:"张之洞",   char:"张", nation:"中国", title:"中体西用名臣", desc:"你稳健务实，主张「中学为体、西学为用」，在守成与变革间寻找平衡。你重视教育与实业，是渐进改良、脚踏实地的建设者。" },
+  kang:   { name:"康有为",   char:"康", nation:"中国", title:"维新变法领袖", desc:"你理想宏大、热血激昂，渴望以一场自上而下的变法让国家迅速富强。你敢于上书言事、挑战旧制，是充满理想与使命感的改革者。" },
+  liang:  { name:"梁启超",   char:"梁", nation:"中国", title:"启蒙思想家", desc:"你才思敏捷、笔耕不辍，善于吸收新思想又不断反思调整。你相信启发民智、循序渐进，是温和而富有远见的启蒙者。" },
+  yuan:   { name:"袁世凯",   char:"袁", nation:"中国", title:"北洋领袖", desc:"你精于权谋、手腕高超，善于在乱局中审时度势、把握机会。你重实力与实效、野心勃勃，是现实主义与机会主义的化身。" },
+  sun:    { name:"孙中山",   char:"孙", nation:"中国", title:"革命先行者", desc:"你百折不挠、理想坚定，以「民族、民权、民生」为纲，毕生为推翻帝制、建立共和而奔走。你开放包容、矢志不渝，是纯粹的理想主义者。" },
+  chen:   { name:"陈独秀",   char:"陈", nation:"中国", title:"新文化运动旗手", desc:"你思想激进、锋芒毕露，敢于向旧传统开战、开辟新路。你激情四射、特立独行，是那种为理想与主义不惜牺牲的先行者。" },
+  luxun:  { name:"鲁迅",     char:"鲁", nation:"中国", title:"民族魂·文学巨匠", desc:"你冷峻犀利、独立思考，用笔作匕首解剖国民性。你愤世嫉俗又心怀大爱，宁折不弯、绝不同流合污，是清醒而孤独的批判者。" },
+  hu:     { name:"胡适",     char:"胡", nation:"中国", title:"自由主义知识分子", desc:"你理性温和、崇尚自由与渐进，主张「多研究些问题，少谈些主义」。你宽容、重实证、讲逻辑，是理性的改良主义者。" },
+  jiang:  { name:"蒋介石",   char:"蒋", nation:"中国", title:"国民革命军统帅", desc:"你意志坚定、顽强不屈，坚信唯有统一与强军才能救国。你重秩序、讲纪律、善用权谋，是乱世中强硬而坚韧的民族主义者。" },
+  mao:    { name:"毛泽东",   char:"毛", nation:"中国", title:"革命领袖", desc:"你理想热忱、意志如铁，怀有改天换地的雄心。你看重群众动员与斗争，敢于打破一切旧框架，越挫越勇、绝不屈服，是彻底的革命者。" },
+  zhou:   { name:"周恩来",   char:"周", nation:"中国", title:"人民的总理", desc:"你温文尔雅、精明干练，善于协调各方、化解矛盾。你务实而顾全大局，把个人荣辱置于事业之下，是深孚众望的调和者与实干家。" },
+  song:   { name:"宋庆龄",   char:"宋", nation:"中国", title:"国母·和平主义者", desc:"你温婉坚定、心怀大爱，毕生为和平、民主与妇女儿童事业奔走。你理想主义而立场鲜明，是道义与仁爱的化身。" },
+  deng:   { name:"邓小平",   char:"邓", nation:"中国", title:"改革开放总设计师", desc:"你务实灵活、深谋远虑，相信发展才是硬道理。你「摸着石头过河」，用渐进改革与制度设计化解难题，是稳中求进、能屈能伸的改革者。" },
+  zhangxueliang:{ name:"张学良", char:"良", nation:"中国", title:"少帅", desc:"你性情率真、重情重义，在历史关头以「西安事变」的兵谏扭转时局。你意气用事又心怀民族大义，是敢作敢当、亦正亦奇的性情中人。" },
+  gu:     { name:"顾维钧",   char:"顾", nation:"中国", title:"民国第一外交家", desc:"你温文尔雅、精通国际法，坚信外交与规则的力量。你在巴黎和会上据理力争，是把国家尊严寄于国际舞台的理性外交家。" },
+  jing:   { name:"蒋经国",   char:"经", nation:"台湾", title:"台湾建设者", desc:"你务实勤政、亲民低调，推动经济腾飞又在晚年开放党禁、开启民主。你循序渐进、重视民生，是稳健而开明的现代化推动者。" },
+  xixiang:{ name:"西乡隆盛", char:"西", nation:"日本", title:"最后的武士", desc:"你刚烈忠义、热血豪迈，坚守武士道精神，为理想不惜一死。你宁折不弯、坦荡磊落，是悲壮而纯粹的武士。" },
+  longma: { name:"坂本龙马", char:"坂", nation:"日本", title:"维新志士", desc:"你开朗豁达、眼光超前，善于在敌对势力间斡旋、促成联合。你胸襟开阔、不囿于门户，是理想与行动兼备的开路人。" },
+  fuze:   { name:"福泽谕吉", char:"福", nation:"日本", title:"启蒙之父", desc:"你理性独立、锐意进取，主张「脱亚入欧」、以科学与文明立国。你崇尚独立自尊与实学，是眼光远大的启蒙思想家。" },
+  ito:    { name:"伊藤博文", char:"伊", nation:"日本", title:"明治宪法之父", desc:"你务实而灵活，善于在传统与西方之间寻找平衡，主持立宪、推动维新。你精于政略、步步为营，是制度化的现代化推手。" },
+  yamagata:{ name:"山县有朋", char:"山", nation:"日本", title:"日本陆军之父", desc:"你冷静强硬、现实主义，坚信军事与秩序是国家的根基。你深谋远虑、手腕老辣，是典型的官僚与军国主义者。" },
+  okuma:  { name:"大隈重信", char:"隈", nation:"日本", title:"宪政先驱", desc:"你开明务实、热衷教育与民权，主张政党政治与宪政。你视野开阔、善用民意，是理性而进步的宪政主义者。" },
+  meiji:  { name:"明治天皇", char:"明", nation:"日本", title:"明治天皇", desc:"你象征着一个时代的变革，带领国家完成维新、走向富国强兵。你威严而进取，是集权与现代化的精神支柱。" },
+  togou:  { name:"东乡平八郎", char:"乡", nation:"日本", title:"海军元帅", desc:"你沉着果决、胆略过人，在海战中一击制胜。你冷静而勇猛，是那种关键时刻敢于先发制人的军人。" },
+  inukai: { name:"犬养毅",   char:"犬", nation:"日本", title:"政党政治领袖", desc:"你温厚而重情义，坚持政党政治与议会民主，反对军部专横。你理想而克制，是乱世中坚守宪政的温和派。" },
+  yoshida:{ name:"吉田茂",   char:"吉", nation:"日本", title:"战后首相", desc:"你务实冷静、亲美亲欧，坚信「轻军备、重经济」的立国之道。你理性而坚韧，是废墟上重建国家的现实主义政治家。" },
+  tojo:   { name:"东条英机", char:"条", nation:"日本", title:"二战首相", desc:"你强硬固执、狂热尚武，相信武力与扩张是国家的出路。你偏执而不妥协，是极端的军国主义者。" },
+  kishi:  { name:"岸信介",   char:"岸", nation:"日本", title:"保守派首相", desc:"你精明强干、保守务实，坚定亲美反共、推进日美安保。你手腕老练、重秩序，是典型的保守派官僚政治家。" },
+  ikeda:  { name:"池田勇人", char:"池", nation:"日本", title:"经济首相", desc:"你温和务实、专注经济，以「收入倍增」让国家走向繁荣。你理性而平和，是把发展当作头等大事的建设者。" },
+  kimku:  { name:"金九",     char:"九", nation:"韩国", title:"独立运动之父", desc:"你坚毅笃诚、矢志独立，主张联合各方、建立统一国家。你德高望重、顾全大局，是民族独立的道义象征。" },
+  an:     { name:"安重根",   char:"安", nation:"韩国", title:"民族义士", desc:"你热血刚烈、气节凛然，为民族大义甘愿舍身。你宁为玉碎、视死如归，是宁折不弯的民族英雄。" },
+  rhee:   { name:"李承晚",   char:"晚", nation:"韩国", title:"大韩民国首任总统", desc:"你强硬顽固、反共亲美，坚信唯有强权与意志才能立国。你固执己见、专断独行，是典型的威权民族主义者。" },
+  kim:    { name:"金日成",   char:"成", nation:"朝鲜", title:"开国领袖", desc:"你意志坚定、野心勃勃，以「主体思想」建立绝对权威。你崇尚革命与集权、反帝反殖，是彻底的威权革命者。" },
+  park:   { name:"朴正熙",   char:"朴", nation:"韩国", title:"汉江奇迹缔造者", desc:"你强硬务实、纪律严明，以铁腕推动工业化与经济增长。你重秩序、重结果，是威权发展主义的代表。" },
+  dae:    { name:"金大中",   char:"中", nation:"韩国", title:"民主斗士", desc:"你坚韧不拔、心怀和平，历经迫害仍坚持民主，用「阳光政策」化敌为友。你理想而不失务实，是宽容的民主领袖。" },
+  chun:   { name:"全斗焕",   char:"全", nation:"韩国", title:"威权统治者", desc:"你冷酷强硬、野心勃勃，以军事力量镇压异己、掌控政权。你重权力与秩序，是铁腕的威权统治者。" },
+  bogd:   { name:"博格多汗", char:"博", nation:"蒙古", title:"蒙古宗教领袖", desc:"你身兼宗教与世俗领袖，带领蒙古走向独立。你庄重而富有象征意义，是民族自决的精神象征。" },
+  sukh:   { name:"苏赫巴托尔", char:"苏", nation:"蒙古", title:"蒙古革命领袖", desc:"你勇敢坚毅、满怀理想，为蒙古的独立与革命献身。你热血忠诚，是年轻的革命先驱。" },
+  wei:    { name:"蒋渭水",   char:"渭", nation:"台湾", title:"台湾民主先驱", desc:"你热血激昂、关心社会，倡导启蒙与民众运动、反抗殖民统治。你理想而激进，是台湾近代社会运动的先声。" },
+  xian:   { name:"林献堂",   char:"献", nation:"台湾", title:"议会请愿运动领袖", desc:"你温文儒雅、理性克制，以议会请愿的方式争取台湾人的权利。你稳健而坚持，是非暴力抗争的温和派。" },
+  lee:    { name:"李登辉",   char:"登", nation:"台湾", title:"台湾民主化推动者", desc:"你务实灵活、善于审时度势，推动台湾走向民主与本土化。你深谙权术又勇于变革，是转型期的老练政治家。" },
+  dazhao: { name:"李大钊",   char:"钊", nation:"中国", title:"马克思主义先驱", desc:"你温厚博学、信念坚定，是共产主义在中国的先驱。你胸怀理想、视死如归，是「铁肩担道义」的理想主义者。" },
+  peng:   { name:"彭德怀",   char:"彭", nation:"中国", title:"横刀立马的元帅", desc:"你刚直不阿、敢说真话，战功赫赫却从不阿谀奉承。你实事求是、宁折不弯，是顶天立地的硬汉。" },
+  qiujin: { name:"秋瑾",     char:"秋", nation:"中国", title:"鉴湖女侠", desc:"你英姿飒爽、侠肝义胆，为革命与妇女解放不惜献身。你刚烈豪迈、视死如归，是巾帼不让须眉的革命志士。" },
+};
+
+const DIMS = ["经济政治倾向","国际法态度","行事方式","性格"];
+const LETTERS = ['A','B','C','D','E','F'];
+
+const questions = [
+  // ===== 维度一：经济政治倾向（15题）=====
+  { d:0, q:"关于经济体制，你更认同哪种看法？", options:[
+    { t:"计划与公有为主，由国家统一调配。", s:{ mao:2, chen:2, dazhao:2, kim:2 } },
+    { t:"市场经济、自由竞争。", s:{ hu:2, okuma:2, lee:2, fuze:1 } },
+    { t:"国家主导、统制经济。", s:{ meiji:2, jiang:2, park:2, kishi:2 } },
+    { t:"市场为主，国家在关键领域掌舵。", s:{ deng:2, jing:2, ikeda:2 } },
+  ]},
+  { d:0, q:"社会财富分配上，你更倾向？", options:[
+    { t:"平均主义，追求共同富裕。", s:{ mao:2, chen:2, kim:2 } },
+    { t:"允许差距，鼓励竞争与奋斗。", s:{ okuma:2, lee:2, hu:1, fuze:1 } },
+    { t:"兼顾效率与公平。", s:{ deng:2, jing:2, dae:2, zhou:1 } },
+    { t:"国强优先，可容忍暂时不均。", s:{ meiji:2, park:2, yuan:2 } },
+  ]},
+  { d:0, q:"你认为社会变革应该怎样进行？", options:[
+    { t:"彻底革命，推倒重来。", s:{ mao:2, chen:2, hong:2, kim:2 } },
+    { t:"渐进改良，稳步推进。", s:{ liang:2, hu:2, ito:2, zhang:2 } },
+    { t:"自上而下的维新变法。", s:{ kang:2, meiji:2, longma:2, jing:1 } },
+    { t:"维持既有秩序与传统。", s:{ cixi:2, zeng:2, xian:1 } },
+  ]},
+  { d:0, q:"你希望政府扮演什么角色？", options:[
+    { t:"强政府，集中力量办大事。", s:{ meiji:2, yuan:2, park:2, chun:2 } },
+    { t:"小政府，管得越少越好。", s:{ hu:2, okuma:2, lee:2, fuze:1 } },
+    { t:"大政府，全面保障民生。", s:{ song:2, dae:2, liang:1 } },
+    { t:"有限但有为，该管的管、该放的放。", s:{ deng:2, jing:2, zhou:1 } },
+  ]},
+  { d:0, q:"「自由」与「平等」之间，你更看重？", options:[
+    { t:"自由优先。", s:{ hu:2, okuma:2, fuze:2, lee:2 } },
+    { t:"平等优先。", s:{ mao:2, chen:2, dazhao:2, kim:1 } },
+    { t:"秩序与稳定优先。", s:{ zeng:2, cixi:2, chun:2, park:1 } },
+    { t:"两者平衡、相互成就。", s:{ sun:2, zhou:2, dae:2 } },
+  ]},
+  { d:0, q:"对待传统文化，你的态度？", options:[
+    { t:"彻底反传统、破旧立新。", s:{ chen:2, luxun:2, mao:2 } },
+    { t:"中学为体、西学为用，渐进融合。", s:{ zhang:2, liang:2, ito:2 } },
+    { t:"全盘西化／脱亚入欧。", s:{ fuze:2, hu:2 } },
+    { t:"坚守传统与固有秩序。", s:{ zeng:2, cixi:2, xixiang:2 } },
+  ]},
+  { d:0, q:"关于对外开放，你的立场？", options:[
+    { t:"积极开放、向强者学习。", s:{ fuze:2, ito:2, longma:2, okuma:2 } },
+    { t:"闭关自守、自力更生。", s:{ mao:2, cixi:2 } },
+    { t:"师夷长技以制夷。", s:{ lin:2, zhang:2, zuo:2 } },
+    { t:"开放但有底线、保持自主。", s:{ deng:2, zhou:2, jing:2 } },
+  ]},
+  { d:0, q:"你最认同哪种国家认同？", options:[
+    { t:"民族独立、本国至上。", s:{ sun:2, jiang:2, lin:2, an:2, kimku:1, bogd:1 } },
+    { t:"国际主义、天下大同。", s:{ mao:2, chen:1, dazhao:2, song:2 } },
+    { t:"阶级与革命认同。", s:{ kim:2, sukh:2, dazhao:1 } },
+    { t:"世界主义、融入文明。", s:{ kang:2, liang:2, fuze:1 } },
+  ]},
+  { d:0, q:"对待君主与帝制，你的态度？", options:[
+    { t:"坚决推翻、建立共和。", s:{ sun:2, chen:2, mao:2, hong:2 } },
+    { t:"君主立宪、虚君实宪。", s:{ kang:2, liang:2, ito:2, longma:2 } },
+    { t:"拥护并维系皇权。", s:{ cixi:2, zeng:1, meiji:2, bogd:1 } },
+    { t:"无所谓形式，只看实效。", s:{ li:2, zhang:2, jing:2, yuan:1 } },
+  ]},
+  { d:0, q:"关于民生福利，你的态度？", options:[
+    { t:"政府提供全面保障。", s:{ song:2, kim:2, dae:2 } },
+    { t:"适度福利、量力而行。", s:{ deng:2, jing:2, ikeda:2 } },
+    { t:"低福利、优先发展经济。", s:{ park:2, meiji:2, lee:1 } },
+    { t:"民间互助、不依赖政府。", s:{ zeng:2, hu:1 } },
+  ]},
+  { d:0, q:"对待土地与农民，你的立场？", options:[
+    { t:"耕者有其田、土地改革。", s:{ sun:2, mao:2, kim:2 } },
+    { t:"保护地主、维护传统秩序。", s:{ zeng:2, cixi:2 } },
+    { t:"工业化优先，暂时牺牲农业。", s:{ meiji:2, park:2, jiang:2 } },
+    { t:"城乡均衡、协调发展。", s:{ deng:2, jing:1 } },
+  ]},
+  { d:0, q:"对待资本与工商业，你会？", options:[
+    { t:"发展民族工商业、实业救国。", s:{ zhang:2, liang:2, sun:2 } },
+    { t:"消灭剥削、公私合营。", s:{ mao:2, chen:2 } },
+    { t:"官督商办、国家掌控。", s:{ li:2, yuan:2, meiji:2 } },
+    { t:"自由放任、鼓励私营。", s:{ okuma:2, hu:2, lee:2 } },
+  ]},
+  { d:0, q:"对改革节奏，你更认同？", options:[
+    { t:"激进，一步到位。", s:{ chen:2, mao:2, hong:2 } },
+    { t:"温和，循序渐进。", s:{ liang:2, hu:2, ito:2, jing:2 } },
+    { t:"强力铁腕，快刀斩乱麻。", s:{ yuan:2, park:2, chun:2 } },
+    { t:"摸着石头过河。", s:{ deng:3 } },
+  ]},
+  { d:0, q:"对外部世界的态度？", options:[
+    { t:"对外扩张、建立势力。", s:{ tojo:2, meiji:2, yamagata:2, togou:1 } },
+    { t:"和平共处、不称霸。", s:{ zhou:2, deng:2, dae:2, yoshida:1 } },
+    { t:"收复失土、保家卫国。", s:{ zuo:2, lin:2, jiang:2, an:1, zhangxueliang:1 } },
+    { t:"结盟自强、借力发展。", s:{ li:2, ito:2, kishi:2 } },
+  ]},
+  { d:0, q:"你心中理想的社会图景是？", options:[
+    { t:"大同世界、共同富裕。", s:{ sun:2, kang:2, song:2, dazhao:1 } },
+    { t:"富国强兵、自立于世界。", s:{ meiji:2, ito:2, fuze:2, zhang:1 } },
+    { t:"自由民主、法治社会。", s:{ hu:2, okuma:2, lee:2, dae:2 } },
+    { t:"独立自主的强国。", s:{ mao:2, jiang:2, kim:1, sukh:1 } },
+  ]},
+
+  // ===== 维度二：国际法态度（15题）=====
+  { d:1, q:"面对国际规则与条约，你的态度是？", options:[
+    { t:"严守国际法，以规则立国。", s:{ gu:2, zhou:2, okuma:2 } },
+    { t:"弱肉强食，实力至上。", s:{ tojo:2, yamagata:2, yuan:2 } },
+    { t:"利用规则、为我所用。", s:{ li:2, ito:2, kishi:2 } },
+    { t:"反帝，不信强权规则。", s:{ mao:2, kim:2, an:2 } },
+  ]},
+  { d:1, q:"关于国际秩序，你希望？", options:[
+    { t:"建立国际合作机制。", s:{ gu:2, song:2, dae:2 } },
+    { t:"强权均势、现实平衡。", s:{ li:2, ito:2, yamagata:2 } },
+    { t:"民族自决、各守其土。", s:{ sun:2, kimku:2, sukh:2, an:1 } },
+    { t:"推翻旧秩序、建立新世界。", s:{ mao:2, chen:2, dazhao:2 } },
+  ]},
+  { d:1, q:"对外交往，你的方式更接近？", options:[
+    { t:"以夷制夷、借力打力。", s:{ li:2, ito:2, kishi:2 } },
+    { t:"强硬对抗、宁折不弯。", s:{ lin:2, zuo:2, mao:2, jiang:2 } },
+    { t:"谈判协商、和平解决。", s:{ zhou:2, gu:2, dae:2 } },
+    { t:"依附强国、寻求庇护。", s:{ rhee:2, kishi:1, yoshida:1 } },
+  ]},
+  { d:1, q:"关于战争与和平，你的看法？", options:[
+    { t:"反对战争，主张非暴力。", s:{ song:2, dae:2, kang:2 } },
+    { t:"必要时以武力解决。", s:{ togou:2, tojo:2, yamagata:2, peng:1 } },
+    { t:"决不投降、血战到底。", s:{ xixiang:2, jiang:2, an:2, lin:1 } },
+    { t:"慎战，和平发展优先。", s:{ zhou:2, deng:2, jing:2, yoshida:1 } },
+  ]},
+  { d:1, q:"对殖民地与被压迫民族，你的立场？", options:[
+    { t:"支持民族独立解放。", s:{ sun:2, kimku:2, an:2, sukh:2 } },
+    { t:"反帝反殖、输出革命。", s:{ mao:2, kim:2, dazhao:1 } },
+    { t:"痛恨列强、奋发图强。", s:{ lin:2, zuo:2, qiujin:2 } },
+    { t:"承认现实、忍辱图强。", s:{ li:2, ito:1, zeng:1 } },
+  ]},
+  { d:1, q:"关于领土与主权，你会？", options:[
+    { t:"寸土不让、誓死捍卫。", s:{ zuo:2, lin:2, jiang:2, an:2 } },
+    { t:"和平谈判解决争端。", s:{ zhou:2, gu:2, dae:2 } },
+    { t:"通过战争开疆拓土。", s:{ tojo:2, togou:2, meiji:2 } },
+    { t:"实力不足、先隐忍图强。", s:{ li:2, mao:1, ito:1 } },
+  ]},
+  { d:1, q:"对国际组织，你的态度？", options:[
+    { t:"积极参与、主动融入。", s:{ gu:2, zhou:2, okuma:2, dae:1 } },
+    { t:"利用但不依赖。", s:{ deng:2, ito:2, kishi:2 } },
+    { t:"怀疑抵触、自力更生。", s:{ mao:2, kim:2 } },
+    { t:"另起炉灶、建立新体系。", s:{ chen:2, dazhao:1, sukh:1 } },
+  ]},
+  { d:1, q:"你的地缘战略更倾向？", options:[
+    { t:"大陆经略、开疆拓土。", s:{ zuo:2, meiji:2, yamagata:2, tojo:1 } },
+    { t:"发展海权、走向海洋。", s:{ togou:2, tojo:1, meiji:1 } },
+    { t:"韬光养晦、积蓄实力。", s:{ deng:3, jing:1 } },
+    { t:"输出革命、解放世界。", s:{ mao:2, kim:2, dazhao:1 } },
+  ]},
+  { d:1, q:"对外关系的独立自主程度？", options:[
+    { t:"坚决独立、不依附大国。", s:{ mao:2, jiang:2, kim:2, an:1 } },
+    { t:"结盟求安全。", s:{ rhee:2, kishi:2, lee:1, yoshida:1 } },
+    { t:"灵活务实、左右逢源。", s:{ li:2, ito:2, zhou:2 } },
+    { t:"依附强者、加速发展。", s:{ fuze:1, okuma:1, meiji:1 } },
+  ]},
+  { d:1, q:"对外谈判，你的风格？", options:[
+    { t:"强硬、寸步不让。", s:{ jiang:2, an:2, lin:2, zuo:1 } },
+    { t:"灵活、以柔克刚。", s:{ zhou:2, li:2, ito:2, deng:2 } },
+    { t:"讲求道义、以理服人。", s:{ gu:2, song:2, kang:2 } },
+    { t:"拖延周旋、待时而动。", s:{ yuan:2, cixi:1, li:1 } },
+  ]},
+  { d:1, q:"关于国际盟友，你的观点？", options:[
+    { t:"稳定同盟、长久合作。", s:{ rhee:2, kishi:2, jiang:1 } },
+    { t:"利益同盟、随时调整。", s:{ li:2, ito:2, yuan:2 } },
+    { t:"不结盟、独立自主。", s:{ mao:2, kim:2, deng:2 } },
+    { t:"反帝统一战线。", s:{ sun:2, chen:2, kimku:2, zhangxueliang:2 } },
+  ]},
+  { d:1, q:"对国际规则的双重标准，你的态度？", options:[
+    { t:"反对双标、要求公平。", s:{ sun:2, kimku:2, mao:2 } },
+    { t:"接受现实、为我所用。", s:{ li:2, ito:2, deng:2 } },
+    { t:"制定规则、主导秩序。", s:{ meiji:2, okuma:1, gu:1 } },
+    { t:"只认实力，规则次要。", s:{ tojo:2, yamagata:2, yuan:1 } },
+  ]},
+  { d:1, q:"对外部援助与依赖，你的态度？", options:[
+    { t:"自力更生、拒绝依赖。", s:{ mao:2, kim:2, sukh:2 } },
+    { t:"利用外资发展自己。", s:{ deng:2, jing:2, ikeda:2 } },
+    { t:"接受援助、亲美合作。", s:{ rhee:2, kishi:2, jiang:2 } },
+    { t:"对外援助、输出革命。", s:{ mao:1, kim:1 } },
+  ]},
+  { d:1, q:"对民族独立运动，你的立场？", options:[
+    { t:"武装抗争、血荐轩辕。", s:{ kimku:2, an:2, sun:2, sukh:2 } },
+    { t:"非暴力、议会请愿。", s:{ xian:2, wei:1, dae:2 } },
+    { t:"革命暴动、挺身而出。", s:{ qiujin:2, mao:2, chen:2 } },
+    { t:"寻求外部支持、渐进自治。", s:{ bogd:2, rhee:1, lee:1 } },
+  ]},
+  { d:1, q:"对国际秩序的最终期望？", options:[
+    { t:"融入西方主导秩序。", s:{ fuze:2, okuma:2, kishi:2, rhee:1, yoshida:1 } },
+    { t:"改造旧秩序、另立新规。", s:{ sun:2, mao:2, kim:2 } },
+    { t:"独立自主、不选边站队。", s:{ deng:2, zhou:2, kim:1 } },
+    { t:"建立东亚新秩序。", s:{ meiji:2, tojo:2, yamagata:2 } },
+  ]},
+
+  // ===== 维度三：行事方式（15题）=====
+  { d:2, q:"你达成目标的主要手段更接近？", options:[
+    { t:"谈判妥协、纵横捭阖。", s:{ li:2, zhou:2, ito:2 } },
+    { t:"武力强攻、雷霆手段。", s:{ togou:2, peng:2, tojo:2, xixiang:1 } },
+    { t:"革命暴动、武装起义。", s:{ sun:2, qiujin:2, hong:2, kim:1 } },
+    { t:"渐进改良、制度设计。", s:{ liang:2, hu:2, jing:2, ikeda:1 } },
+  ]},
+  { d:2, q:"做重大决策时，你更依赖？", options:[
+    { t:"理性计算与利益分析。", s:{ li:2, yuan:2, ito:2, kishi:1 } },
+    { t:"信念与理想。", s:{ sun:2, dazhao:2, song:2, qiujin:1 } },
+    { t:"直觉与个人决断。", s:{ mao:2, togou:2, jiang:1 } },
+    { t:"广泛征询、民主协商。", s:{ zhou:2, gu:2, okuma:2 } },
+  ]},
+  { d:2, q:"面对反对者，你通常会？", options:[
+    { t:"说服争取、凝聚共识。", s:{ zhou:2, liang:2, dae:2 } },
+    { t:"排除异己、坚决清除。", s:{ yuan:2, cixi:2, chun:2, kim:1 } },
+    { t:"分化瓦解、各个击破。", s:{ li:2, ito:2, kishi:2 } },
+    { t:"刚烈对抗、宁折不弯。", s:{ luxun:2, xixiang:2, an:2, peng:1 } },
+  ]},
+  { d:2, q:"你的用人风格是？", options:[
+    { t:"唯才是举、不拘一格。", s:{ zeng:2, jiang:2, meiji:2 } },
+    { t:"忠诚可靠优先。", s:{ mao:2, kim:2, chun:1, cixi:1 } },
+    { t:"平衡各方、协调关系。", s:{ li:2, zhou:2, ito:2 } },
+    { t:"敢用有争议的人才。", s:{ deng:2, yuan:2, park:2 } },
+  ]},
+  { d:2, q:"你对权力的看法？", options:[
+    { t:"急流勇退、不恋权位。", s:{ sun:2, zhou:1, gu:1 } },
+    { t:"牢牢掌控、不容旁落。", s:{ cixi:2, yuan:2, chun:2, kim:2 } },
+    { t:"权力为理想与事业服务。", s:{ mao:2, chen:1, dazhao:1, qiujin:1 } },
+    { t:"权力是用来做事的工具。", s:{ deng:2, li:2, park:2, jing:1 } },
+  ]},
+  { d:2, q:"面对失败，你通常会？", options:[
+    { t:"越挫越勇、永不言弃。", s:{ sun:2, mao:2, kimku:2, an:1 } },
+    { t:"反思复盘、调整策略。", s:{ liang:2, deng:2, zhou:2 } },
+    { t:"宁为玉碎、不为瓦全。", s:{ xixiang:2, qiujin:2, an:2 } },
+    { t:"隐忍待时、东山再起。", s:{ li:2, zeng:2, mao:1 } },
+  ]},
+  { d:2, q:"你做事的计划性如何？", options:[
+    { t:"长远规划、步步为营。", s:{ deng:2, ito:2, meiji:2, zhang:1 } },
+    { t:"当机立断、抓住战机。", s:{ togou:2, yuan:2, longma:2 } },
+    { t:"理想驱动、随势而动。", s:{ qiujin:2, hong:2, dazhao:1 } },
+    { t:"制度保障、按部就班。", s:{ okuma:2, gu:2, ikeda:1 } },
+  ]},
+  { d:2, q:"对规则的运用，你倾向？", options:[
+    { t:"制定规则、约束他人。", s:{ meiji:2, ito:2, yuan:2 } },
+    { t:"严格遵守既有规则。", s:{ gu:2, hu:2, dae:2 } },
+    { t:"变通规则、达成目的。", s:{ li:2, deng:2, kishi:2 } },
+    { t:"打破规则、破旧立新。", s:{ mao:2, chen:2, luxun:2, hong:1 } },
+  ]},
+  { d:2, q:"危机中的领导方式？", options:[
+    { t:"沉着稳舵、凝聚人心。", s:{ zhou:2, jing:2, ikeda:2 } },
+    { t:"果断强硬、当机立断。", s:{ togou:2, peng:2, chun:2, tojo:1 } },
+    { t:"坚守原则、绝不妥协。", s:{ sun:2, dazhao:2, an:2 } },
+    { t:"灵活应变、随机调整。", s:{ li:2, deng:2, ito:2 } },
+  ]},
+  { d:2, q:"你倾向哪种组织方式？", options:[
+    { t:"严密组织、铁的纪律。", s:{ mao:2, kim:2, chun:2, chen:1 } },
+    { t:"松散联盟、协商共治。", s:{ sun:2, kimku:1, liang:1, inukai:2 } },
+    { t:"个人魅力领导。", s:{ mao:1, jiang:1, qiujin:2 } },
+    { t:"制度化、程序化领导。", s:{ ito:2, okuma:2, gu:1, jing:1 } },
+  ]},
+  { d:2, q:"「效率」与「程序」之间，你更看重？", options:[
+    { t:"效率优先。", s:{ yuan:2, park:2, tojo:2, chun:1 } },
+    { t:"程序正义优先。", s:{ hu:2, gu:2, dae:2 } },
+    { t:"两者尽量平衡。", s:{ zhou:2, deng:2, ito:1 } },
+    { t:"理想高于效率。", s:{ sun:2, dazhao:2, qiujin:1 } },
+  ]},
+  { d:2, q:"改革遇到巨大阻力，你会？", options:[
+    { t:"强推到底、不计代价。", s:{ park:2, chun:2, jiang:2 } },
+    { t:"分步妥协、循序渐进。", s:{ deng:2, liang:2, jing:2 } },
+    { t:"发动群众、形成声势。", s:{ mao:2, hong:2, kim:2 } },
+    { t:"借外力倒逼、顺势而为。", s:{ li:2, ito:2, meiji:1 } },
+  ]},
+  { d:2, q:"对待下属与民众，你倾向？", options:[
+    { t:"威严公正、赏罚分明。", s:{ zeng:2, jiang:2 } },
+    { t:"严刑峻法、令行禁止。", s:{ chun:2, park:2, kim:2, cixi:1 } },
+    { t:"亲民亲和、体恤百姓。", s:{ zhou:2, song:2, dae:2 } },
+    { t:"放手信任、以制度管人。", s:{ gu:2, ito:2, okuma:1 } },
+  ]},
+  { d:2, q:"你的时间观更接近？", options:[
+    { t:"只争朝夕、时不我待。", s:{ mao:2, qiujin:2, chen:2 } },
+    { t:"百年大计、循序渐进。", s:{ deng:2, ito:2, meiji:1, jing:1 } },
+    { t:"功在当代、为后世奠基。", s:{ zeng:2, yuan:2, zuo:2 } },
+    { t:"随机应变、见机行事。", s:{ li:2, kishi:2, longma:1 } },
+  ]},
+  { d:2, q:"你希望给后世留下什么？", options:[
+    { t:"制度与现代化。", s:{ ito:2, meiji:2, okuma:2, zhang:1 } },
+    { t:"精神与理想。", s:{ luxun:2, dazhao:2, qiujin:2, sun:1 } },
+    { t:"富强与稳定。", s:{ deng:2, park:2, ikeda:2, jing:1 } },
+    { t:"民主与自由。", s:{ hu:2, dae:2, lee:2, wei:2, xian:1, inukai:1 } },
+  ]},
+
+  // ===== 维度四：性格（15题）=====
+  { d:3, q:"你的性格更接近？", options:[
+    { t:"顽强坚韧，越挫越勇。", s:{ mao:2, sun:2, kimku:1, jiang:1 } },
+    { t:"自信果决，敢于出手。", s:{ togou:2, yuan:2, jiang:1, peng:1 } },
+    { t:"冷静深沉，深谋远虑。", s:{ zeng:2, li:2, ito:2, kishi:1 } },
+    { t:"激情理想，热血奔涌。", s:{ qiujin:2, hong:2, dazhao:2, longma:1 } },
+  ]},
+  { d:3, q:"面对危机，你通常会？", options:[
+    { t:"沉着应对，寻找转机。", s:{ zhou:2, deng:2, jing:2 } },
+    { t:"果断出手，先发制人。", s:{ togou:2, peng:2, tojo:2 } },
+    { t:"坚守原则，绝不退让。", s:{ an:2, sun:2, dazhao:2 } },
+    { t:"灵活变通，顺势而为。", s:{ li:2, ito:2, liang:2 } },
+  ]},
+  { d:3, q:"你更看重什么价值？", options:[
+    { t:"效率与结果。", s:{ yuan:2, park:2, tojo:2 } },
+    { t:"公平与正义。", s:{ song:2, dae:2, sun:2, dazhao:1 } },
+    { t:"秩序与稳定。", s:{ zeng:2, cixi:2, chun:2, park:1 } },
+    { t:"自由与个人权利。", s:{ hu:2, okuma:2, lee:2, fuze:1, wei:1 } },
+  ]},
+  { d:3, q:"你的人生信条更接近？", options:[
+    { t:"「治大国若烹小鲜」，稳中求进。", s:{ deng:3 } },
+    { t:"「天行健，自强不息」，绝不屈服。", s:{ mao:2, jiang:2, sun:1 } },
+    { t:"「兼爱非攻」，仁爱和平。", s:{ song:2, kang:2, dae:2 } },
+    { t:"「强权即公理」，实力说话。", s:{ yuan:2, tojo:2, yamagata:1 } },
+    { t:"「苟利国家生死以」，以身许国。", s:{ lin:2, an:2, xixiang:1, zhangxueliang:1 } },
+  ]},
+  { d:3, q:"面对诱惑与妥协，你会？", options:[
+    { t:"坚守底线，不为所动。", s:{ luxun:2, an:2, dazhao:2, sun:1 } },
+    { t:"灵活妥协，以退为进。", s:{ li:2, zhou:2, deng:2, liang:1 } },
+    { t:"强硬拒绝，寸步不让。", s:{ zuo:2, xixiang:2, mao:1 } },
+    { t:"权衡利弊，见机行事。", s:{ yuan:2, ito:2, kishi:1 } },
+  ]},
+  { d:3, q:"你的自信程度？", options:[
+    { t:"极度自信，舍我其谁。", s:{ mao:2, togou:2, jiang:2, yuan:1 } },
+    { t:"自信但务实。", s:{ deng:2, ito:2, park:2, jing:1 } },
+    { t:"谦逊内敛，不居功。", s:{ gu:2, zeng:2, ikeda:2 } },
+    { t:"信念坚定，毫不动摇。", s:{ qiujin:2, an:2, dazhao:2, kimku:1 } },
+  ]},
+  { d:3, q:"你的情绪控制方式？", options:[
+    { t:"深藏不露，不动声色。", s:{ cixi:2, yuan:2, kishi:2, li:1 } },
+    { t:"激情外露，快意恩仇。", s:{ qiujin:2, hong:2, luxun:2 } },
+    { t:"沉着冷静，处变不惊。", s:{ zeng:2, gu:2, ikeda:2 } },
+    { t:"感染力强，激情演说。", s:{ mao:2, sun:2, liang:2, song:1 } },
+  ]},
+  { d:3, q:"对待风险，你倾向？", options:[
+    { t:"谨慎保守，稳字当头。", s:{ zeng:2, jing:2, ikeda:2 } },
+    { t:"敢于豪赌，孤注一掷。", s:{ yuan:2, togou:2, hong:2, zhangxueliang:2 } },
+    { t:"稳中求进，量力而行。", s:{ deng:2, ito:2, zhou:2 } },
+    { t:"为理想冒险，义无反顾。", s:{ qiujin:2, an:2, dazhao:2, longma:1 } },
+  ]},
+  { d:3, q:"你的独立性如何？", options:[
+    { t:"独立自主，不依附于人。", s:{ mao:2, jiang:2, kim:2, xixiang:1 } },
+    { t:"善用合作，借力打力。", s:{ zhou:2, li:2, ito:2, okuma:1 } },
+    { t:"追随理想与信仰。", s:{ dazhao:2, chen:1, sukh:1 } },
+    { t:"独立判断，坚持己见。", s:{ hu:2, luxun:2, gu:2 } },
+  ]},
+  { d:3, q:"你是理想主义者还是现实主义者？", options:[
+    { t:"理想主义。", s:{ sun:2, qiujin:2, dazhao:2, song:2, hong:1 } },
+    { t:"现实主义。", s:{ li:2, yuan:2, zeng:2, ito:1 } },
+    { t:"务实的理想主义。", s:{ deng:2, zhou:2, liang:2, dae:2 } },
+    { t:"强权现实。", s:{ tojo:2, yamagata:2, chun:1, park:1 } },
+  ]},
+  { d:3, q:"面对批评，你会？", options:[
+    { t:"虚心纳谏，有则改之。", s:{ zhou:2, dae:2, okuma:2, inukai:1 } },
+    { t:"压制异议，不容挑战。", s:{ cixi:2, chun:2, kim:2, park:1 } },
+    { t:"有选择地听取。", s:{ deng:2, li:2, ito:2, jing:1 } },
+    { t:"坚持己见，不为所动。", s:{ mao:2, jiang:2, xixiang:1 } },
+  ]},
+  { d:3, q:"你给人的感觉是？", options:[
+    { t:"亲和、有魅力。", s:{ zhou:2, song:2, sun:2, liang:1 } },
+    { t:"严肃、有威严。", s:{ zeng:2, jiang:2, tojo:1 } },
+    { t:"平易近人。", s:{ deng:2, hu:2, dae:2, gu:1 } },
+    { t:"激情、有号召力。", s:{ mao:2, qiujin:2, hong:2 } },
+  ]},
+  { d:3, q:"你如何坚持一件长期的事？", options:[
+    { t:"当作终身事业，矢志不渝。", s:{ sun:2, mao:2, kimku:1, kim:1 } },
+    { t:"分阶段、有步骤地推进。", s:{ deng:2, ito:2, jing:2, meiji:1 } },
+    { t:"随时调整、灵活应变。", s:{ li:2, yuan:2, kishi:1 } },
+    { t:"功成之后、潇洒身退。", s:{ zhou:1, gu:1, longma:2 } },
+  ]},
+  { d:3, q:"面对孤独与逆境，你会？", options:[
+    { t:"在孤独中坚守理想。", s:{ dazhao:2, luxun:2, kimku:2, song:1 } },
+    { t:"忍辱负重，等待时机。", s:{ deng:2, li:2, mao:1, zhou:1 } },
+    { t:"绝不屈服，抗争到底。", s:{ xixiang:2, an:2, qiujin:2, sun:1 } },
+    { t:"淡然处之，宠辱不惊。", s:{ zeng:2, gu:2, ikeda:1 } },
+  ]},
+  { d:3, q:"你希望被后世记住为？", options:[
+    { t:"改革者。", s:{ deng:2, ito:2, jing:2, zhang:2 } },
+    { t:"革命者。", s:{ mao:2, sun:2, qiujin:2, kim:1 } },
+    { t:"独立／解放者。", s:{ kimku:2, an:2, sukh:2, lin:1 } },
+    { t:"奠基者／强人。", s:{ meiji:2, yuan:2, zeng:2, park:1 } },
+  ]},
+];
+
+let current = 0;
+let scores = {};
+let answers = [];
+
+function startQuiz() {
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  current = 0; scores = {}; answers = [];
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('qNumText').textContent = `第 ${current+1} / ${questions.length} 题`;
+  document.getElementById('dimTag').textContent = DIMS[q.d];
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('progressBar').style.width = `${(current/questions.length)*100}%`;
+
+  const box = document.getElementById('qOptions');
+  box.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const el = document.createElement('div');
+    el.className = 'option' + (answers[current] === i ? ' selected' : '');
+    el.innerHTML = `<span class="letter">${LETTERS[i]}</span><span>${opt.t}</span>`;
+    el.onclick = () => selectOption(i);
+    box.appendChild(el);
+  });
+
+  document.getElementById('prevBtn').classList.toggle('hidden', current === 0);
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = current === questions.length - 1 ? '查看结果' : '下一题';
+  nextBtn.disabled = answers[current] === undefined;
+}
+
+function selectOption(i) {
+  answers[current] = i;
+  document.getElementById('nextBtn').disabled = false;
+  document.querySelectorAll('#qOptions .option').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+}
+
+function nextQuestion() {
+  if (answers[current] === undefined) return;
+  if (current < questions.length - 1) { current++; renderQuestion(); }
+  else showResult();
+}
+
+function prevQuestion() { if (current > 0) { current--; renderQuestion(); } }
+
+function showResult() {
+  const total = {};
+  answers.forEach((ans, qi) => {
+    const s = questions[qi].options[ans].s;
+    for (const id in s) total[id] = (total[id] || 0) + s[id];
+  });
+
+  const ranked = Object.keys(total)
+    .map(id => ({ id, score: total[id] }))
+    .sort((a,b) => b.score - a.score);
+
+  const top = ranked[0];
+  const maxScore = top.score;
+  const f = figures[top.id];
+
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('result').classList.remove('hidden');
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('rAvatar').textContent = f.char;
+  document.getElementById('rName').textContent = f.name;
+  document.getElementById('rTitle').textContent = f.title;
+  document.getElementById('rDesc').textContent = f.desc;
+  document.getElementById('rPct').textContent = '100%';
+  document.getElementById('rRegion').textContent = f.nation + ' · ' + f.title;
+
+  const rankBox = document.getElementById('rRank');
+  rankBox.innerHTML = '';
+  ranked.slice(0, 6).forEach((r, i) => {
+    const pct = Math.round((r.score / maxScore) * 100);
+    const rf = figures[r.id];
+    rankBox.innerHTML += `
+      <div class="rank-item">
+        <div class="name">${i===0?'★ ':''}${rf.name}</div>
+        <div class="rank-bar"><div class="rank-fill" style="width:${pct}%"></div></div>
+        <div class="pct">${pct}%</div>
+      </div>`;
+  });
+}
+
+function restart() {
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('intro').classList.remove('hidden');
+  document.getElementById('progressBar').style.width = '0%';
+}
+</script>
+</body>
+</html>
