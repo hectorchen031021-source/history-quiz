@@ -176,6 +176,15 @@
   .dim-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width .6s cubic-bezier(.22,.61,.36,1); }
   .dim-item .dim-pct { width: 38px; text-align: right; font-size: 12px; color: var(--muted); font-family: var(--font-text); flex: none; }
   .dims-text { margin-top: 14px; font-size: 14px; line-height: 1.7; color: var(--ink); text-align: left; }
+
+  .modal { position: fixed; inset: 0; background: rgba(6,43,138,.55); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-box { background: var(--surface); border-radius: 18px; padding: 30px 26px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,.3); }
+  .modal-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .modal-desc { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal input { width: 100%; padding: 13px 16px; border: 1px solid var(--line); border-radius: 12px; font-size: 15px; letter-spacing: .1em; text-align: center; text-transform: uppercase; font-family: var(--font-text); color: var(--ink); margin-bottom: 12px; }
+  .modal input:focus { outline: none; border-color: var(--accent); }
+  .modal-err { font-size: 13px; color: #b3261e; margin-bottom: 10px; }
+  .modal .btn { margin-bottom: 10px; }
   .hidden { display: none !important; }
 
   .fade-in { animation: fadeIn .45s ease; }
@@ -261,6 +270,18 @@
       </div>
     </div>
   </div>
+
+  <div class="modal hidden" id="actModal">
+    <div class="modal-box">
+      <div class="modal-title">激活完整测试</div>
+      <div class="modal-desc">输入激活码后即可开始测试（激活一次，永久有效）</div>
+      <input type="text" id="actInput" placeholder="CM-XXXX-XXXX-XXXX" maxlength="19" autocomplete="off">
+      <div class="modal-err hidden" id="actErr">激活码无效，请检查后重试</div>
+      <button class="btn" onclick="cmActivate()">激活并开始</button>
+      <button class="ghost" onclick="cmClose()">取消</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const figures = {
@@ -1413,6 +1434,7 @@ function updateOptCount() {
 }
 
 function startQuiz() {
+  if (!cmIsActivated()) { cmOpen(); return; }
   const len = +document.querySelector('input[name="qlen"]:checked').value;
   const maxRank = len === 35 ? 1 : (len === 50 ? 2 : 3);
   const regions = { jp: document.getElementById('optToggleJp').checked, cn: document.getElementById('optToggleCn').checked, tw: document.getElementById('optToggleTw').checked };
@@ -1560,6 +1582,16 @@ function restart() {
   document.getElementById('intro').classList.remove('hidden');
   document.getElementById('progressBar').style.width = '0%';
 }
+
+
+const CM_SALT = 'cm2024@history#quiz';
+const CM_VALID = new Set(["wvspan","klbjj6","3daqpo","qlt3aw","w278s8","gz4dxx","1qv57nj","1fsii9z","1lq6p9a","18liaer","x3t49w","7ouqgm","t576uh","feddrm","1z0muox","98xawz","1hq4e6s","1tamczy","6bbobn","1ovsqb4","17b2egn","1fbhr6j","h6elwb","37vc3p","1by0vqp","dv1ebh","1fnl8my","16nosl2","1bdtzlp","1trdy6z","8pm017","vu6b63","oys0re","c6r3uh","ih4288","1n0m8ng","1wt09ys","atolhn","1o7gzjm","14o8jcp","1r0a169","cepb6f","dzhurl","s6ygu0","1p2clw1","lyo2ze","1jdhnq3","1nxw6g6","104bqnn","1iu6jdv","m4wvsv","13wo3rd","1coifxl","oflbln","9be6cg","g98ukk","1ipdoan","14av8om","1k0z9e4","oze7ta","1tjaavw","sh4lju","7k3713","1rfox1b","poia1p","1hw5ak5","1k7ds3n","r431ii","1a4q0m8","10ykj95","xf07w4","19eichn","r2o4j6","8ubq3t","z9f7ho","1qlp95a","1w1d4p3","1tbt9w1","1m56m3d","4s5k5g","1bqrc41","7w0yd4","1ltjhfv","6y8ot","1v5qgej","198vuuv","cxgar5","n70qg9","1e2y4n7","189mjse","wzpyk3","kwy6mx","14vn9lq","1kfjrf3","adpn1k","1h5k94j","1f0knz2","1sm3xwj","15zd00v","d7tmf7"]);
+function cmNorm(c){ return c.toUpperCase().replace(/[\s\-]/g,''); }
+function cmHash(str){ let h=5381; for(let i=0;i<str.length;i++) h=((h<<5)+h+str.charCodeAt(i))>>>0; return h.toString(36); }
+function cmIsActivated(){ try { return localStorage.getItem('cm_activated') === '1'; } catch(e){ return false; } }
+function cmOpen(){ document.getElementById('actModal').classList.remove('hidden'); document.getElementById('actInput').value=''; document.getElementById('actErr').classList.add('hidden'); document.getElementById('actInput').focus(); }
+function cmClose(){ document.getElementById('actModal').classList.add('hidden'); }
+function cmActivate(){ const code = document.getElementById('actInput').value.trim(); if(!code) return; const h = cmHash(cmNorm(code)+CM_SALT); if(CM_VALID.has(h)){ try{ localStorage.setItem('cm_activated','1'); }catch(e){} cmClose(); startQuiz(); } else { document.getElementById('actErr').classList.remove('hidden'); } }
 
 buildOptList();
 </script>
